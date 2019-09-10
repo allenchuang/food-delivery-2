@@ -2,10 +2,10 @@ import React from "react";
 import { connect } from "react-redux";
 import logo from "./logo.svg";
 import "./App.css";
-import { START_CHANNEL, STOP_CHANNEL } from "./actions";
+import { START_CHANNEL, STOP_CHANNEL } from "./redux/actions";
 
 // test
-import io from "socket.io-client";
+// import io from "socket.io-client";
 
 const mapStateToProps = state => ({
   data: state.data,
@@ -30,7 +30,9 @@ class App extends React.Component {
     this.props.start();
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+    this.props.stop();
+  }
 
   render() {
     console.log(this.props.data);
