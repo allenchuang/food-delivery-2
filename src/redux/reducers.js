@@ -12,26 +12,39 @@ const initialState = {
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
+  // let { data, orderMap, inactiveOrders, activeOrders } = state;
+  // let newData = [...data];
+  // if (Object.keys(order).length !== 0) {
+  //   state.data.unshift(order);
+  // }
+  //   orderMap[order.id] = order;
+  //   activeOrders = Object.values(orderMap)
+  //     .filter(order => ACTIONS.ACTIVE_EVENTS.includes(order.event_name))
+  //     .sort((a, b) => b.sent_at_second - a.sent_at_second);
+  //   inactiveOrders = Object.values(orderMap)
+  //     .filter(order => ACTIONS.INACTIVE_EVENTS.includes(order.event_name))
+  //     .sort((a, b) => b.sent_at_second - a.sent_at_second);
+  // }
 
-  let { orderMap, activeOrders, inactiveOrders } = state;
-  orderMap[order.id] = order;
-  activeOrders = Object.values(orderMap)
-    .filter(order => ACTIONS.ACTIVE_EVENTS.includes(order.event_name))
-    .sort((a, b) => b.sent_at_second - a.sent_at_second);
-  inactiveOrders = Object.values(orderMap)
-    .filter(order => ACTIONS.INACTIVE_EVENTS.includes(order.event_name))
-    .sort((a, b) => b.sent_at_second - a.sent_at_second);
-
-  let combineOrder = { ...order, sec };
   return {
     ...state,
     serverOnline: true,
-    data: [combineOrder, ...state.data], // create feed
-    sec, // time elapsed
-    orderMap,
-    activeOrders,
-    inactiveOrders
+    sec, // time elapsed,
+    data: Object.keys(order).length !== 0 ? [order, ...state.data] : state.data
+    // orderMap,
+    // activeOrders,
+    // inactiveOrders
   };
+
+  // return {
+  //   ...state,
+  //   serverOnline: true,
+  //   data: [order, ...state.data], // create feed
+  //   sec, // time elapsed
+  //   orderMap,
+  //   activeOrders,
+  //   inactiveOrders
+  // };
 };
 
 export default (state = initialState, action) => {

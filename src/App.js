@@ -4,14 +4,8 @@ import logo from "./logo.svg";
 import "./App.css";
 import { START_CHANNEL, STOP_CHANNEL } from "./redux/actions";
 
-// test
-// import io from "socket.io-client";
-
 const mapStateToProps = state => ({
-  data: state.data,
-  sec: state.sec,
-  channelOnline: state.channelOnline,
-  serverOnline: state.serverOnline
+  ...state
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -35,11 +29,9 @@ class App extends React.Component {
   }
 
   render() {
-    console.log(this.props.data);
     const orderList = this.props.data.map(order => (
       <li key={Math.random()}>
-        {order.sec}
-        {order.id}
+        {order.sent_at_second} -{order.id}
         {order.name}
         {order.event_name}
         {order.destination}
@@ -49,7 +41,8 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+          {/* <img src={logo} className="App-logo" alt="logo" /> */}
+          {this.props.sec}
           {this.props.channelOnline ? (
             <p style={{ color: "green" }}>Socket Channel Connected</p>
           ) : (

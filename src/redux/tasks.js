@@ -66,38 +66,6 @@ const listenReconnectSaga = function*(socket) {
   }
 };
 
-// Saga to switch on channel.
-// const listenServerSaga = function* () {
-//   try {
-//     yield put({type: ACTIONS.CHANNEL_ON});
-//     const {timeout} = yield race({
-//       connected: call(connect),
-//       timeout: delay(5000),
-//     });
-//     if (timeout) {
-//       yield put({type: ACTIONS.SERVER_OFF});
-//     }
-//     const socket = yield call(connect);
-//     const socketChannel = yield call(createSocketChannel, socket);
-
-//     // yield fork(listenDisconnectSaga(socketChannel));
-//     // yield fork(listenConnectSaga(socketChannel));
-//     yield put({type: ACTIONS.SERVER_ON});
-
-//     while (true) {
-//       const { order, sec } = yield take(socketChannel);
-//       yield put({type: ACTIONS.SUBSCRIBE_TIMER, order, sec});
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   } finally {
-//     if (yield cancelled()) {
-//       socket.disconnect(true);
-//       yield put({type: ACTIONS.CHANNEL_OFF});
-//     }
-//   }
-// };
-
 export default function* startStopChannel() {
   yield take(ACTIONS.START_CHANNEL);
   try {
@@ -111,15 +79,15 @@ export default function* startStopChannel() {
       yield fork(read, socket);
       yield fork(listenDisconnectSaga, socket);
       yield fork(listenReconnectSaga, socket);
-    } else {
+    } else if (timeout) {
       yield put({ type: ACTIONS.SERVER_OFF });
-      socket.disconnect(true);
+      // socket.disconnect(true);
     }
   } catch (error) {
     console.log(error);
   } finally {
     if (yield cancelled()) {
-      socket.disconnect(true);
+      socket && socket.disconnect(true);
       yield put({ type: ACTIONS.CHANNEL_OFF });
     }
   }
