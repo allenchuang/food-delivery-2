@@ -8,15 +8,16 @@ import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import { mainListItems, secondaryListItems } from "./listItems";
+import Tooltip from "@material-ui/core/Tooltip";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import StopIcon from "@material-ui/icons/Stop";
+import { mainListItems } from "./listItems";
 import Chart from "./Chart";
 import Deposits from "./Deposits";
 import Orders from "./Orders";
@@ -125,7 +126,7 @@ const styles = theme => ({
 
 class Dashboard extends React.Component {
   state = {
-    open: true
+    open: false
   };
 
   handleDrawerOpen = () => {
@@ -136,8 +137,15 @@ class Dashboard extends React.Component {
     this.setState({ open: false });
   };
 
+  handleServerStart = () => {
+    this.props.start();
+  };
+
+  handleServerStop = () => {
+    this.props.stop();
+  };
+
   componentDidMount() {
-    // io('http://localhost:4001')
     this.props.start();
   }
 
@@ -146,7 +154,7 @@ class Dashboard extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, channelOnline, serverOnline, sec } = this.props;
     const { open } = this.state;
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -177,13 +185,26 @@ class Dashboard extends React.Component {
               noWrap
               className={classes.title}
             >
-              Dashboard
+              Cloud Kitchen Dashboard
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            <Tooltip title="Start Server Data">
+              <IconButton
+                onClick={this.handleServerStart}
+                color="inherit"
+                aria-label="startServer"
+              >
+                <PlayArrowIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Stop Server Data">
+              <IconButton
+                onClick={this.handleServerStop}
+                color="inherit"
+                aria-label="stopServer"
+              >
+                <StopIcon />
+              </IconButton>
+            </Tooltip>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -200,8 +221,6 @@ class Dashboard extends React.Component {
           </div>
           <Divider />
           <List>{mainListItems}</List>
-          <Divider />
-          <List>{secondaryListItems}</List>
         </Drawer>
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
@@ -213,16 +232,20 @@ class Dashboard extends React.Component {
                   <Chart />
                 </Paper>
               </Grid>
-              {/* Recent Deposits */}
+              {/* Server Status */}
               <Grid item xs={12} md={4} lg={3}>
                 <Paper className={fixedHeightPaper}>
-                  <Deposits />
+                  <Deposits
+                    channelOnline={channelOnline}
+                    sec={sec}
+                    serverOnline={serverOnline}
+                  />
                 </Paper>
               </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
-                  <Orders />
+                  <Orders title="Active Orders" />
                 </Paper>
               </Grid>
             </Grid>

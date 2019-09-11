@@ -9,15 +9,11 @@ export const SERVER_OFF = "SERVER_OFF";
 export const SUBSCRIBE_TIMER = "SUBSCRIBE_TIMER";
 
 export const GET_ACTIVE_ORDERS = "GET_ACTIVE_ORDERS";
-export const FILTER_CREATED_ORDERS = "FILTER_CREATED_ORDERS";
-export const FILTER_COOKED_ORDERS = "FILTER_COOKED_ORDERS";
+export const FILTER_ACTIVE_ORDERS_TYPE = "FILTER_ACTIVE_ORDERS_TYPE";
+export const FILTER_ACTIVE_ORDERS_SEC = "FILTER_ACTIVE_ORDERS_SEC";
 
 export const GET_ORDER_HISTORY = "GET_ORDER_HISTORY";
 export const UPDATE_ORDER = "UPDATE_ORDER";
-
-// ORDER CONSTANTS
-export const ACTIVE_EVENTS = ["CREATED", "COOKED", "DRIVER_RECEIVED"];
-export const INACTIVE_EVENTS = ["CANCELLED", "DELIVERED"];
 
 // ACTION CREATORS
 
@@ -35,12 +31,14 @@ export const getActiveOrders = () => ({
   type: GET_ACTIVE_ORDERS
 });
 
-export const filterCreatedOrders = () => ({
-  type: FILTER_CREATED_ORDERS
+export const filterByType = eventType => ({
+  type: FILTER_ACTIVE_ORDERS_TYPE,
+  eventType
 });
 
-export const filterCookedOrders = () => ({
-  type: FILTER_COOKED_ORDERS
+export const filterBySec = secTilNow => ({
+  type: FILTER_ACTIVE_ORDERS_SEC,
+  secTilNow
 });
 
 // --- ORDER HISTORY

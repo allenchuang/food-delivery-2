@@ -1,4 +1,5 @@
 import * as ACTIONS from "./actions";
+import * as CONSTANTS from "../constants";
 
 const initialState = {
   data: [],
@@ -7,44 +8,63 @@ const initialState = {
   orderMap: {},
   sec: 0,
   channelOnline: false,
-  serverOnline: undefined
+  serverOnline: undefined,
+  filteredType: "",
+  filteredSec: ""
 };
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
-  // let { data, orderMap, inactiveOrders, activeOrders } = state;
-  // let newData = [...data];
-  // if (Object.keys(order).length !== 0) {
-  //   state.data.unshift(order);
-  // }
-  //   orderMap[order.id] = order;
-  //   activeOrders = Object.values(orderMap)
-  //     .filter(order => ACTIONS.ACTIVE_EVENTS.includes(order.event_name))
-  //     .sort((a, b) => b.sent_at_second - a.sent_at_second);
-  //   inactiveOrders = Object.values(orderMap)
-  //     .filter(order => ACTIONS.INACTIVE_EVENTS.includes(order.event_name))
-  //     .sort((a, b) => b.sent_at_second - a.sent_at_second);
-  // }
+  let { data, orderMap, inactiveOrders, activeOrders } = state;
+  let newData = [...data];
+  if (Object.keys(order).length !== 0) {
+    newData.unshift(order);
+    orderMap[order.id] = order;
+  }
 
   return {
     ...state,
     serverOnline: true,
     sec, // time elapsed,
-    data: Object.keys(order).length !== 0 ? [order, ...state.data] : state.data
-    // orderMap,
-    // activeOrders,
-    // inactiveOrders
+    data: newData,
+    orderMap,
+    activeOrders,
+    inactiveOrders
   };
+};
 
-  // return {
-  //   ...state,
-  //   serverOnline: true,
-  //   data: [order, ...state.data], // create feed
-  //   sec, // time elapsed
-  //   orderMap,
-  //   activeOrders,
-  //   inactiveOrders
-  // };
+const handleFilterByType = (state, action) => {
+  const { eventType } = action;
+  switch (eventType) {
+    case "showAll":
+      return {
+        ...state,
+        filteredType: null
+      };
+    case CONSTANTS.CREATED:
+      return {
+        ...state,
+        filteredType: CONSTANTS.CREATED
+      };
+    case CONSTANTS.COOKED:
+      return {
+        ...state,
+        filteredType: CONSTANTS.COOKED
+      };
+    default:
+      return {
+        ...state,
+        filteredType: eventType
+      };
+  }
+};
+
+const handleFilterBySec = (state, action) => {
+  const { secTilNow } = action;
+  return {
+    ...state,
+    filteredSec: secTilNow
+  };
 };
 
 export default (state = initialState, action) => {
@@ -59,6 +79,10 @@ export default (state = initialState, action) => {
       return { ...state, serverOnline: true };
     case ACTIONS.SUBSCRIBE_TIMER:
       return handleSubscription(state, action);
+    case ACTIONS.FILTER_ACTIVE_ORDERS_TYPE:
+      return handleFilterByType(state, action);
+    case ACTIONS.FILTER_ACTIVE_ORDERS_SEC:
+      return handleFilterBySec(state, action);
     default:
       return state;
   }
