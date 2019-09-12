@@ -19,7 +19,13 @@ const handleSubscription = (state, action) => {
   let newData = [...data];
   if (Object.keys(order).length !== 0) {
     newData.unshift(order);
-    orderMap[order.id] = order;
+    orderMap[order.id] = orderMap[order.id]
+      ? {
+          ...orderMap[order.id],
+          event_name: order.event_name,
+          sent_at_second: order.sent_at_second
+        }
+      : order;
   }
 
   return {
@@ -67,6 +73,10 @@ const handleFilterBySec = (state, action) => {
   };
 };
 
+const handleGetOrdersGeocode = (state, action) => {
+  const { order } = action;
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case ACTIONS.CHANNEL_ON:
@@ -83,6 +93,8 @@ export default (state = initialState, action) => {
       return handleFilterByType(state, action);
     case ACTIONS.FILTER_ACTIVE_ORDERS_SEC:
       return handleFilterBySec(state, action);
+    case ACTIONS.GET_ORDERS_GEOCODE:
+      return handleGetOrdersGeocode(state, action);
     default:
       return state;
   }

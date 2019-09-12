@@ -7,21 +7,10 @@ import { START_CHANNEL, STOP_CHANNEL } from "./redux/actions";
 const mapStateToProps = state => ({
   ...state
 });
-
-const mapDispatchToProps = dispatch => ({
-  start: () =>
-    dispatch({
-      type: START_CHANNEL
-    }),
-  stop: () =>
-    dispatch({
-      type: STOP_CHANNEL
-    })
-});
 class App extends React.Component {
   componentDidMount() {
     // io('http://localhost:4001')
-    this.props.start();
+    // this.props.start();
   }
 
   componentWillUnmount() {

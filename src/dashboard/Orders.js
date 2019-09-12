@@ -108,6 +108,7 @@ const Orders = ({
             id="standard-number"
             label="Seconds"
             value={filteredSec}
+            defaultValue={0}
             onChange={handleFilterBySec}
             type="number"
             className={classes.textField}

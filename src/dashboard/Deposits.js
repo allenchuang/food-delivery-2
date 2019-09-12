@@ -35,9 +35,9 @@ export default function Deposits({ ...props }) {
         <p style={{ color: "red" }}>Server Offline</p>
       )}
       <div>
-        <Link color="primary" href="#">
+        {/* <Link color="primary" href="#">
           View balance
-        </Link>
+        </Link> */}
       </div>
     </React.Fragment>
   );
