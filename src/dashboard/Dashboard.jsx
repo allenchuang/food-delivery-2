@@ -152,11 +152,18 @@ class Dashboard extends React.Component {
   }
 
   componentWillUnmount() {
-    this.props.stop();
+    this.props.stopChannel();
   }
 
   render() {
-    const { classes, channelOnline, serverOnline, sec, startChannel, stopChannel} = this.props;
+    const {
+      classes,
+      channelOnline,
+      serverOnline,
+      sec,
+      startChannel,
+      stopChannel
+    } = this.props;
     const { open } = this.state;
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 

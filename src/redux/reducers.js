@@ -15,10 +15,9 @@ const initialState = {
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
-  let { data, orderMap, inactiveOrders, activeOrders } = state;
-  let newData = [...data];
+  let data = [...state.data], orderMap = {...state.orderMap};
   if (Object.keys(order).length !== 0) {
-    newData.unshift(order);
+    data.unshift(order);
     orderMap[order.id] = orderMap[order.id]
       ? {
           ...orderMap[order.id],
@@ -32,10 +31,11 @@ const handleSubscription = (state, action) => {
     ...state,
     serverOnline: true,
     sec, // time elapsed,
-    data: newData,
+    data,
     orderMap,
-    activeOrders,
-    inactiveOrders
+    // Moved logic to selectors.js
+    // activeOrders, 
+    // inactiveOrders
   };
 };
 
@@ -73,16 +73,13 @@ const handleFilterBySec = (state, action) => {
   };
 };
 
-const handleGetOrdersGeocode = (state, action) => {
-  const { order } = action;
-};
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case ACTIONS.CHANNEL_ON:
       return { ...state, channelOnline: true };
     case ACTIONS.CHANNEL_OFF:
-      return { ...state, channelOnline: false, serverOnline: undefined };
+      return { ...state, channelOnline: false, serverOnline: undefined, sec: 0 };
     case ACTIONS.SERVER_OFF:
       return { ...state, serverOnline: false };
     case ACTIONS.SERVER_ON:
@@ -93,8 +90,6 @@ export default (state = initialState, action) => {
       return handleFilterByType(state, action);
     case ACTIONS.FILTER_ACTIVE_ORDERS_SEC:
       return handleFilterBySec(state, action);
-    case ACTIONS.GET_ORDERS_GEOCODE:
-      return handleGetOrdersGeocode(state, action);
     default:
       return state;
   }
