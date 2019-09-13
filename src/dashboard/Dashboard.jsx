@@ -27,6 +27,8 @@ import { connect } from "react-redux";
 import * as ACTIONS from "../redux/actions";
 import { withStyles } from "@material-ui/core/styles";
 
+import MapTest from "./MapTest";
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -137,24 +139,31 @@ class Dashboard extends React.Component {
     this.setState({ open: false });
   };
 
-  handleServerStart = () => {
-    this.props.start();
-  };
+  // handleServerStart = () => {
+  //   this.props.start();
+  // };
 
-  handleServerStop = () => {
-    this.props.stop();
-  };
+  // handleServerStop = () => {
+  //   this.props.stop();
+  // };
 
   componentDidMount() {
-    this.props.start();
+    // this.props.start();
   }
 
   componentWillUnmount() {
-    this.props.stop();
+    this.props.stopChannel();
   }
 
   render() {
-    const { classes, channelOnline, serverOnline, sec } = this.props;
+    const {
+      classes,
+      channelOnline,
+      serverOnline,
+      sec,
+      startChannel,
+      stopChannel
+    } = this.props;
     const { open } = this.state;
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -189,7 +198,7 @@ class Dashboard extends React.Component {
             </Typography>
             <Tooltip title="Start Server Data">
               <IconButton
-                onClick={this.handleServerStart}
+                onClick={startChannel}
                 color="inherit"
                 aria-label="startServer"
               >
@@ -198,7 +207,7 @@ class Dashboard extends React.Component {
             </Tooltip>
             <Tooltip title="Stop Server Data">
               <IconButton
-                onClick={this.handleServerStop}
+                onClick={stopChannel}
                 color="inherit"
                 aria-label="stopServer"
               >
@@ -242,6 +251,11 @@ class Dashboard extends React.Component {
                   />
                 </Paper>
               </Grid>
+              {/* MAP */}
+              <Grid item xs={12}>
+                <MapTest />
+                <Paper className={classes.paper}></Paper>
+              </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
@@ -261,16 +275,10 @@ const mapStateToProps = state => ({
   ...state
 });
 
-const mapDispatchToProps = dispatch => ({
-  start: () =>
-    dispatch({
-      type: ACTIONS.START_CHANNEL
-    }),
-  stop: () =>
-    dispatch({
-      type: ACTIONS.STOP_CHANNEL
-    })
-});
+const mapDispatchToProps = {
+  startChannel: ACTIONS.startChannel,
+  stopChannel: ACTIONS.stopChannel
+};
 
 export default compose(
   withStyles(styles),

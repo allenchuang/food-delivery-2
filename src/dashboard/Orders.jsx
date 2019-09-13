@@ -61,7 +61,11 @@ const Orders = ({
 }) => {
   const classes = useStyles();
   const results = data.map(row => (
-    <TableRow key={`${row.id}-${row.sent_at_second}-${row.name}`}>
+    <TableRow
+      key={`${row.id}-${row.name}-${row.event_name}-${
+        row.sent_at_second
+      }-${new Date().getTime()}`}
+    >
       <TableCell>{row.id}</TableCell>
       <TableCell>{row.name}</TableCell>
       <TableCell>
@@ -78,19 +82,15 @@ const Orders = ({
           <Title>{title}</Title>
         </div>
         <div className={classes.spacer} />
-
         <div>
           <FormControl className={classes.formControl}>
             <InputLabel htmlFor="filter">Filter By</InputLabel>
             <Select
               value={filteredType}
               onChange={handleFilterByType}
-              inputProps={{
-                name: "filterBy",
-                id: "filter"
-              }}
+              inputProps={{ name: "filterBy", id: "filter" }}
             >
-              <MenuItem value={"showAll"}>ALL</MenuItem>
+              <MenuItem value={"showAll"}> ALL</MenuItem>
               {CONSTANTS.ALL_EVENTS.map(event => {
                 return (
                   <MenuItem key={event} value={event}>
@@ -99,7 +99,7 @@ const Orders = ({
                 );
               })}
               {/* <MenuItem value={CONSTANTS.CREATED}>CREATED</MenuItem>
-              <MenuItem value={CONSTANTS.COOKED}>COOKED</MenuItem> */}
+                                                                                                                                                                                                                                              <MenuItem value={CONSTANTS.COOKED}>COOKED</MenuItem> */}
             </Select>
           </FormControl>
         </div>
@@ -108,12 +108,11 @@ const Orders = ({
             id="standard-number"
             label="Seconds"
             value={filteredSec}
+            defaultValue={0}
             onChange={handleFilterBySec}
             type="number"
             className={classes.textField}
-            InputLabelProps={{
-              shrink: true
-            }}
+            InputLabelProps={{ shrink: true }}
           />
         )}
       </Toolbar>
@@ -131,6 +130,7 @@ const Orders = ({
       </Table>
       <div className={classes.seeMore}>
         <Link color="primary" href="#">
+          {" "}
           See more orders
         </Link>
       </div>

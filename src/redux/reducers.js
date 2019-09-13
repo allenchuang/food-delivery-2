@@ -15,21 +15,27 @@ const initialState = {
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
-  let { data, orderMap, inactiveOrders, activeOrders } = state;
-  let newData = [...data];
+  let data = [...state.data], orderMap = {...state.orderMap};
   if (Object.keys(order).length !== 0) {
-    newData.unshift(order);
-    orderMap[order.id] = order;
+    data.unshift(order);
+    orderMap[order.id] = orderMap[order.id]
+      ? {
+          ...orderMap[order.id],
+          event_name: order.event_name,
+          sent_at_second: order.sent_at_second
+        }
+      : order;
   }
 
   return {
     ...state,
     serverOnline: true,
     sec, // time elapsed,
-    data: newData,
+    data,
     orderMap,
-    activeOrders,
-    inactiveOrders
+    // Moved logic to selectors.js
+    // activeOrders, 
+    // inactiveOrders
   };
 };
 
@@ -67,12 +73,13 @@ const handleFilterBySec = (state, action) => {
   };
 };
 
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case ACTIONS.CHANNEL_ON:
       return { ...state, channelOnline: true };
     case ACTIONS.CHANNEL_OFF:
-      return { ...state, channelOnline: false, serverOnline: undefined };
+      return { ...state, channelOnline: false, serverOnline: undefined, sec: 0 };
     case ACTIONS.SERVER_OFF:
       return { ...state, serverOnline: false };
     case ACTIONS.SERVER_ON:
