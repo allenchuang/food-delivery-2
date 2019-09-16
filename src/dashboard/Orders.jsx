@@ -60,7 +60,7 @@ const Orders = ({
   handleFilterBySec
 }) => {
   const classes = useStyles();
-  const results = data.map(row => (
+  const results = activeOrders.map(row => (
     <TableRow
       key={`${row.id}-${row.name}-${row.event_name}-${
         row.sent_at_second
@@ -72,6 +72,9 @@ const Orders = ({
         <span style={colorEventType(row.event_name)}>{row.event_name}</span>
       </TableCell>
       <TableCell>{row.sent_at_second}</TableCell>
+      <TableCell>
+        {row.latitude}-{row.longitude}
+      </TableCell>
       <TableCell align="right">{row.destination}</TableCell>
     </TableRow>
   ));
@@ -123,6 +126,7 @@ const Orders = ({
             <TableCell>Food Name</TableCell>
             <TableCell>Event</TableCell>
             <TableCell>Secs</TableCell>
+            <TableCell>Lat-Long</TableCell>
             <TableCell align="right">Destination</TableCell>
           </TableRow>
         </TableHead>
@@ -140,7 +144,7 @@ const Orders = ({
 
 const mapStateToProps = state => ({
   activeOrders: activeOrdersSelector(state),
-  data: activeOrdersSelector(state),
+  data: state.data,
   filteredType: state.filteredType,
   filteredSec: state.filteredSec
 });

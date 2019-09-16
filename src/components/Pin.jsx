@@ -12,7 +12,7 @@ const pinStyle = {
 
 export default class Pin extends PureComponent {
   render() {
-    const { size = 20, onClick } = this.props;
+    const { size = 20, onClick, customStyle } = this.props;
 
     return (
       <svg
@@ -20,7 +20,8 @@ export default class Pin extends PureComponent {
         viewBox="0 0 24 24"
         style={{
           ...pinStyle,
-          transform: `translate(${-size / 2}px,${-size}px)`
+          transform: `translate(${-size / 2}px,${-size}px)`,
+          ...customStyle
         }}
         onClick={onClick}
       >

@@ -254,7 +254,7 @@ class Dashboard extends React.Component {
               {/* MAP */}
               <Grid item xs={12}>
                 <MapTest />
-                <Paper className={classes.paper}></Paper>
+                {/* <Paper className={classes.paper}></Paper> */}
               </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>

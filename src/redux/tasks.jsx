@@ -68,23 +68,22 @@ const listenReconnectSaga = function*(socket) {
 };
 
 // saga listens for start and stop actions
-export const startStopChannel = function* () {
+export const startStopChannel = function*() {
   while (true) {
     yield take(ACTIONS.START_CHANNEL);
     yield race({
       task: call(listenServerSaga),
-      cancel: take(ACTIONS.STOP_CHANNEL),
+      cancel: take(ACTIONS.STOP_CHANNEL)
     });
   }
 };
 
-
-const listenServerSaga = function* () {
+const listenServerSaga = function*() {
   try {
     yield put({ type: ACTIONS.CHANNEL_ON });
     const { socket, timeout } = yield race({
       socket: call(connect),
-      timeout: delay(5000),
+      timeout: delay(5000)
     });
     // if (socket) {
     //   const socketChannel = yield call(createSocketChannel, socket);
@@ -92,15 +91,15 @@ const listenServerSaga = function* () {
     //   yield fork(listenReconnectSaga, socket);
     //   yield put({ type: ACTIONS.SERVER_ON });
     //   // yield fork(read, socket);
-    // } else  
+    // } else
     if (timeout) {
       yield put({ type: ACTIONS.SERVER_OFF });
       socket.disconnect(true);
     }
     const socketChannel = yield call(createSocketChannel, socket);
-      yield fork(listenDisconnectSaga, socket);
-      yield fork(listenReconnectSaga, socket);
-      yield put({ type: ACTIONS.SERVER_ON });
+    yield fork(listenDisconnectSaga, socket);
+    yield fork(listenReconnectSaga, socket);
+    yield put({ type: ACTIONS.SERVER_ON });
 
     while (true) {
       const { order, sec } = yield take(socketChannel);
@@ -112,7 +111,6 @@ const listenServerSaga = function* () {
         sec
       });
     }
-
   } catch (error) {
     console.log(error);
   } finally {
@@ -121,31 +119,31 @@ const listenServerSaga = function* () {
       yield put({ type: ACTIONS.CHANNEL_OFF });
     }
   }
-}
+};
 
 const getGeocode = order => {
   // if (order.event_name === CONSTANTS.CREATED) {
-    let url = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
-    return fetch(url)
-      .then(res => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("Fetch to MapBox Geocoder failed");
-        }
-      })
-      .then(res => {
-        // append lat / long coordinates
-        let latitude = res.features[0].center[0],
-          longitude = res.features[0].center[1];
-          console.log('order', latitude)
-        return {
-          ...order,
-          latitude,
-          longitude
-        };
-      })
-      .catch(error => console.log(error));
+  let url = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
+  return fetch(url)
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error("Fetch to MapBox Geocoder failed");
+      }
+    })
+    .then(res => {
+      // append lat / long coordinates
+      let latitude = res.features[0].center[0],
+        longitude = res.features[0].center[1];
+      console.log("order", latitude);
+      return {
+        ...order,
+        latitude,
+        longitude
+      };
+    })
+    .catch(error => console.log(error));
   // } else {
   //   return order;
   // }
@@ -171,18 +169,22 @@ const read = function*(socket) {
 const createSocketChannel = socket =>
   eventChannel(emit => {
     const newOrderHandler = async (order, sec) => {
-      let newOrder = {...order};
+      let newOrder = { ...order };
       if (order.event_name === CONSTANTS.CREATED) {
-        let url = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
-        const response = await fetch(url);
-        const json = await response.json();
-  
-        let latitude = json.features[0].center[0],
-            longitude = json.features[0].center[1];
-  
-        newOrder = {...order, latitude, longitude}
+        let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
+        const geoCodeResponse = await fetch(geoCodeUrl);
+        const json = await geoCodeResponse.json();
+
+        let longitude = json.features[0].geometry.coordinates[0];
+        let latitude = json.features[0].geometry.coordinates[1];
+        let directionsUrl = `${CONSTANTS.MAPBOX_DIRECTIONS_URL}${CONSTANTS.MAPBOX_KITCHEN_COORDINATES};${longitude},${latitude}?geometries=geojson&access_token=${CONSTANTS.MAPBOX_TOKEN}`;
+        const directionsResponse = await fetch(directionsUrl);
+        const directionsJson = await directionsResponse.json();
+
+        let directions = directionsJson.routes[0].geometry.coordinates;
+        newOrder = { ...order, latitude, longitude, directions };
       }
-      
+
       emit({
         order: newOrder,
         sec

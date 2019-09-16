@@ -18,15 +18,20 @@ const handleSubscription = (state, action) => {
   let data = [...state.data], orderMap = {...state.orderMap};
   if (Object.keys(order).length !== 0) {
     data.unshift(order);
-    orderMap[order.id] = orderMap[order.id]
+    if (order.event_name === CONSTANTS.CANCELLED) {
+      delete orderMap[order.id];
+    } else {
+      orderMap[order.id] = orderMap[order.id]
       ? {
           ...orderMap[order.id],
           event_name: order.event_name,
           sent_at_second: order.sent_at_second
         }
       : order;
+    }    
   }
 
+  console.log('ordermap',orderMap);
   return {
     ...state,
     serverOnline: true,
