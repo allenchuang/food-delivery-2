@@ -19,7 +19,7 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
 import { mainListItems } from "./listItems";
 import Chart from "./Chart";
-import Deposits from "./Deposits";
+import ServerStatus from "./ServerStatus";
 import Orders from "./Orders";
 
 import { compose } from "redux";
@@ -27,7 +27,7 @@ import { connect } from "react-redux";
 import * as ACTIONS from "../redux/actions";
 import { withStyles } from "@material-ui/core/styles";
 
-import MapTest from "./MapTest";
+import Map from "./Map";
 
 function Copyright() {
   return (
@@ -244,16 +244,16 @@ class Dashboard extends React.Component {
               {/* Server Status */}
               <Grid item xs={12} md={4} lg={3}>
                 <Paper className={fixedHeightPaper}>
-                  <Deposits
+                  <ServerStatus
                     channelOnline={channelOnline}
                     sec={sec}
                     serverOnline={serverOnline}
                   />
                 </Paper>
               </Grid>
-              {/* MAP */}
+              {/* Map */}
               <Grid item xs={12}>
-                <MapTest />
+                <Map />
               </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>

@@ -1,7 +1,6 @@
 /* eslint-disable no-script-url */
 
 import React from "react";
-import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Title from "./Title";
@@ -9,10 +8,16 @@ import Title from "./Title";
 const useStyles = makeStyles({
   depositContext: {
     flex: 1
+  },
+  connected: {
+    color: "green"
+  },
+  disconnected: {
+    color: "red"
   }
 });
 
-export default function Deposits({ ...props }) {
+export default function ServerStatus({ ...props }) {
   const classes = useStyles();
   return (
     <React.Fragment>
@@ -20,25 +25,16 @@ export default function Deposits({ ...props }) {
       <Typography component="p" variant="h4">
         {props.sec} secs
       </Typography>
-      {/* <Typography color="textSecondary" className={classes.depositContext}>
-        on 15 March, 2019
-      </Typography>
-      <h4></h4> */}
       {props.channelOnline ? (
-        <p style={{ color: "green" }}>Socket Channel Connected</p>
+        <p className={classes.connected}>Socket Channel Connected</p>
       ) : (
-        <p style={{ color: "red" }}>Channel Disconnected</p>
+        <p className={classes.disconnected}>Channel Disconnected</p>
       )}
       {props.serverOnline ? (
-        <p style={{ color: "green" }}>Server Online</p>
+        <p className={classes.connected}>Server Online</p>
       ) : (
-        <p style={{ color: "red" }}>Server Offline</p>
+        <p className={classes.disconnected}>Server Offline</p>
       )}
-      <div>
-        {/* <Link color="primary" href="#">
-          View balance
-        </Link> */}
-      </div>
     </React.Fragment>
   );
 }
