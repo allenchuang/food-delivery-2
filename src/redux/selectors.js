@@ -1,5 +1,19 @@
 import * as CONSTANTS from "../constants";
 
+export function historicalDataSelector(state = {}) {
+  const { data, filteredType, filteredSec, sec } = state;
+
+  const cutOffSec = filteredSec ? sec - filteredSec : 0; // we want to filter out events greater than cutoff;
+  let result = filteredType
+    ? data.filter(order => order.event_name === filteredType)
+    : data;
+
+  if (filteredType === CONSTANTS.COOKED && filteredSec > 0) {
+    result = result.filter(order => order.sent_at_second > cutOffSec);
+  }
+  return result;
+}
+
 export function activeOrdersSelector(state = {}) {
   const { data, filteredType, filteredSec, sec } = state;
 

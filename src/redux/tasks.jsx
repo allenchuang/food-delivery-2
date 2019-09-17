@@ -67,6 +67,14 @@ const listenReconnectSaga = function*(socket) {
   }
 };
 
+const listenWriteSaga = function*(socket) {
+  while (true) {
+    const { order } = yield take(ACTIONS.UPDATE_ORDER);
+    // yield put({ type: ACTIONS.UPDATE_ORDER, order });
+    socket.emit("updateOrder", order);
+  }
+};
+
 // saga listens for start and stop actions
 export const startStopChannel = function*() {
   while (true) {
@@ -85,26 +93,18 @@ const listenServerSaga = function*() {
       socket: call(connect),
       timeout: delay(5000)
     });
-    // if (socket) {
-    //   const socketChannel = yield call(createSocketChannel, socket);
-    //   yield fork(listenDisconnectSaga, socket);
-    //   yield fork(listenReconnectSaga, socket);
-    //   yield put({ type: ACTIONS.SERVER_ON });
-    //   // yield fork(read, socket);
-    // } else
     if (timeout) {
       yield put({ type: ACTIONS.SERVER_OFF });
       socket.disconnect(true);
     }
     const socketChannel = yield call(createSocketChannel, socket);
+    yield fork(listenWriteSaga, socket);
     yield fork(listenDisconnectSaga, socket);
     yield fork(listenReconnectSaga, socket);
     yield put({ type: ACTIONS.SERVER_ON });
 
     while (true) {
       const { order, sec } = yield take(socketChannel);
-      // const newOrder = yield call(getGeocode, order);
-      // const newOrder = yield take(fetchGeocode);
       yield put({
         type: ACTIONS.SUBSCRIBE_TIMER,
         order: order,
@@ -144,25 +144,6 @@ const getGeocode = order => {
       };
     })
     .catch(error => console.log(error));
-  // } else {
-  //   return order;
-  // }
-};
-
-const read = function*(socket) {
-  const socketChannel = yield call(createSocketChannel, socket);
-
-  while (true) {
-    const { order, sec } = yield take(socketChannel);
-    // const newOrder = yield call(getGeocode, order);
-    // const newOrder = yield take(fetchGeocode);
-    yield put({
-      type: ACTIONS.SUBSCRIBE_TIMER,
-      order: order,
-      sec
-    });
-    // yield put({ type: ACTIONS.GET_ORDERS_GEOCODE, order});
-  }
 };
 
 // This is how channel is created

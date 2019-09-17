@@ -19,8 +19,10 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
 import Toolbar from "@material-ui/core/Toolbar";
+import Modal from "@material-ui/core/Modal";
+import Button from "@material-ui/core/Button";
 
-import { filterByType, filterBySec } from "../redux/actions";
+import { filterByType, filterBySec, updateOrder } from "../redux/actions";
 import * as CONSTANTS from "../constants";
 import { activeOrdersSelector } from "../redux/selectors";
 
@@ -47,39 +49,116 @@ const useStyles = makeStyles(theme => ({
   },
   textField: {
     margin: theme.spacing(1)
+  },
+  paper: {
+    position: "absolute",
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3)
   }
 }));
 
+function getModalStyle() {
+  const top = 50;
+  const left = 50;
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`
+  };
+}
+
 const Orders = ({
   data,
+  sec,
   activeOrders,
   title,
   filteredType,
   filteredSec,
   handleFilterByType,
-  handleFilterBySec
+  handleFilterBySec,
+  handleUpdateOrder
 }) => {
   const classes = useStyles();
-  const results = activeOrders.map(row => (
+  const [modalStyle] = React.useState(getModalStyle);
+  const [open, setOpen] = React.useState(false);
+  const [editOrder, setEditOrder] = React.useState(null);
+
+  const setModalState = state => {
+    setOpen(state);
+    if (state === false) setEditOrder(null);
+  };
+
+  const updateEventType = e => {
+    let newOrder = { ...editOrder, event_name: e.target.value };
+    setEditOrder(newOrder);
+  };
+
+  const results = activeOrders.map(order => (
     <TableRow
-      key={`${row.id}-${row.name}-${row.event_name}-${
-        row.sent_at_second
+      key={`${order.id}-${order.name}-${order.event_name}-${
+        order.sent_at_second
       }-${new Date().getTime()}`}
     >
-      <TableCell>{row.id}</TableCell>
-      <TableCell>{row.name}</TableCell>
+      <TableCell>{order.id}</TableCell>
+      <TableCell>{order.name}</TableCell>
       <TableCell>
-        <span style={colorEventType(row.event_name)}>{row.event_name}</span>
+        <span style={colorEventType(order.event_name)}>{order.event_name}</span>
       </TableCell>
-      <TableCell>{row.sent_at_second}</TableCell>
+      <TableCell>{order.sent_at_second}</TableCell>
       <TableCell>
-        {row.latitude}-{row.longitude}
+        {order.latitude}-{order.longitude}
       </TableCell>
-      <TableCell align="right">{row.destination}</TableCell>
+      <TableCell align="right">{order.destination}</TableCell>
+      <TableCell align="right">
+        <button
+          onClick={() => {
+            setEditOrder(order);
+            setModalState(true);
+          }}
+        >
+          EDIT
+        </button>
+      </TableCell>
     </TableRow>
   ));
   return (
     <React.Fragment>
+      <Modal
+        aria-labelledby="Edit Order Popup"
+        aria-describedby="Modifying an existing order"
+        open={open}
+        onClose={() => setModalState(false)}
+      >
+        {editOrder && (
+          <div style={modalStyle} className={classes.paper}>
+            <h2>Edit Order</h2>
+            <p>{editOrder.id}</p>
+            <p>{editOrder.name}</p>
+            <Select value={editOrder.event_name} onChange={updateEventType}>
+              {CONSTANTS.ALL_EVENTS.map(event => {
+                return (
+                  <MenuItem key={event} value={event}>
+                    {event}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+            <Button
+              onClick={() => {
+                handleUpdateOrder({ ...editOrder, sent_at_second: sec });
+                setModalState(false);
+              }}
+            >
+              Update Order
+            </Button>
+          </div>
+        )}
+      </Modal>
+
       <Toolbar className={classes.root}>
         <div className={classes.title}>
           <Title>{title}</Title>
@@ -128,6 +207,7 @@ const Orders = ({
             <TableCell>Secs</TableCell>
             <TableCell>Lat-Long</TableCell>
             <TableCell align="right">Destination</TableCell>
+            <TableCell align="center">Edit</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>{results}</TableBody>
@@ -146,12 +226,14 @@ const mapStateToProps = state => ({
   activeOrders: activeOrdersSelector(state),
   data: state.data,
   filteredType: state.filteredType,
-  filteredSec: state.filteredSec
+  filteredSec: state.filteredSec,
+  sec: state.sec
 });
 
 const mapDispatchToProps = dispatch => ({
   handleFilterByType: e => dispatch(filterByType(e.target.value)),
-  handleFilterBySec: e => dispatch(filterBySec(parseInt(e.target.value)))
+  handleFilterBySec: e => dispatch(filterBySec(parseInt(e.target.value))),
+  handleUpdateOrder: order => dispatch(updateOrder(order))
 });
 
 export default connect(

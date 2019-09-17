@@ -88,7 +88,14 @@ class App extends Component {
         <Pin
           size={20}
           customStyle={{
-            fill: order.event_name === CONSTANTS.DELIVERED ? "green" : "red"
+            fill:
+              order.event_name === CONSTANTS.DELIVERED
+                ? "green"
+                : order.event_name === CONSTANTS.COOKED
+                ? "orange"
+                : order.event_name === CONSTANTS.DRIVER_RECEIVED
+                ? "blue"
+                : "black"
           }}
           onClick={() => this.setState({ popupInfo: order })}
         />
@@ -124,6 +131,7 @@ class App extends Component {
         {Object.keys(orderMap)
           .filter(
             orderId =>
+              orderMap[orderId].directions &&
               orderMap[orderId].event_name === CONSTANTS.DRIVER_RECEIVED
           )
           .map(orderId => {
@@ -144,7 +152,9 @@ class App extends Component {
     ctx.clearRect(0, 0, width, height);
     Object.keys(orderMap)
       .filter(
-        orderId => orderMap[orderId].event_name === CONSTANTS.DRIVER_RECEIVED
+        orderId =>
+          orderMap[orderId].directions &&
+          orderMap[orderId].event_name === CONSTANTS.DRIVER_RECEIVED
       )
       .map(orderId =>
         orderMap[orderId].directions.map(project).forEach((p, i) => {
@@ -190,10 +200,15 @@ class App extends Component {
 
     const orderAdd =
       Object.entries(orderMap).length !== 0 && orderMap.constructor === Object
-        ? Object.keys(orderMap).map(orderId => {
-            return this._renderOrderMarker(orderMap[orderId], orderId);
-            // }
-          })
+        ? Object.keys(orderMap)
+            .filter(
+              orderId =>
+                orderMap[orderId].latitude && orderMap[orderId].longitude
+            )
+            .map(orderId => {
+              return this._renderOrderMarker(orderMap[orderId], orderId);
+              // }
+            })
         : "";
     return (
       <React.Fragment>
@@ -211,10 +226,10 @@ class App extends Component {
           <CanvasOverlay redraw={this._redrawCanvasOverlay} />
           <Marker key={`kitchen`} longitude={-118.461708} latitude={34.009408}>
             <Pin
-              size={60}
+              size={20}
               customStyle={{
                 fill: "MAGENTA",
-                stroke: "BLACK",
+                stroke: "none",
                 strokeWidth: "2"
               }}
             />
