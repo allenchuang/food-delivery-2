@@ -47,15 +47,11 @@ io.on("connection", socket => {
     }, 1000);
   }
 
+  // Handle Updates
   socket.on("updateOrder", orderData => {
     let newData = data;
-    // {
-    //   orderData.id,
-    //     orderData.name,
-    //     orderData.event_name,
-    //     orderData.destination,
-    //     orderData.sent_at_second;
-    // }
+
+    // for the purpose of this challenge, the updated data is simply pushed to existing json file along with the timestamp (sent_at_second)
     newData.push(orderData);
     fs.writeFile(
       "./mock/challenge_data.json",
@@ -68,6 +64,7 @@ io.on("connection", socket => {
     );
   });
 
+  // Reconnect
   socket.on("reconnect", () => {
     console.log("Socket Reconnected!");
   });

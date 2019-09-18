@@ -29,6 +29,8 @@ import { withStyles } from "@material-ui/core/styles";
 
 import Map from "./Map";
 
+import logo from "../logo-cloudkitchens.png";
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -139,18 +141,6 @@ class Dashboard extends React.Component {
     this.setState({ open: false });
   };
 
-  // handleServerStart = () => {
-  //   this.props.start();
-  // };
-
-  // handleServerStop = () => {
-  //   this.props.stop();
-  // };
-
-  componentDidMount() {
-    // this.props.start();
-  }
-
   componentWillUnmount() {
     this.props.stopChannel();
   }
@@ -187,7 +177,10 @@ class Dashboard extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography
+            <div className={classes.title}>
+              <img src={logo} alt="Cloud Kitchens Dashboard" height={55} />
+            </div>
+            {/* <Typography
               component="h1"
               variant="h6"
               color="inherit"
@@ -195,7 +188,7 @@ class Dashboard extends React.Component {
               className={classes.title}
             >
               Cloud Kitchen Dashboard
-            </Typography>
+            </Typography> */}
             <Tooltip title="Start Server Data">
               <IconButton
                 onClick={startChannel}

@@ -138,23 +138,29 @@ const Orders = ({
             <h2>Edit Order</h2>
             <p>{editOrder.id}</p>
             <p>{editOrder.name}</p>
-            <Select value={editOrder.event_name} onChange={updateEventType}>
-              {CONSTANTS.ALL_EVENTS.map(event => {
-                return (
-                  <MenuItem key={event} value={event}>
-                    {event}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-            <Button
-              onClick={() => {
-                handleUpdateOrder({ ...editOrder, sent_at_second: sec });
-                setModalState(false);
-              }}
-            >
-              Update Order
-            </Button>
+            <div>
+              <Select value={editOrder.event_name} onChange={updateEventType}>
+                {CONSTANTS.ALL_EVENTS.map(event => {
+                  return (
+                    <MenuItem key={event} value={event}>
+                      {event}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  handleUpdateOrder({ ...editOrder, sent_at_second: sec });
+                  setModalState(false);
+                }}
+              >
+                Update Order
+              </Button>
+            </div>
           </div>
         )}
       </Modal>
@@ -180,8 +186,6 @@ const Orders = ({
                   </MenuItem>
                 );
               })}
-              {/* <MenuItem value={CONSTANTS.CREATED}>CREATED</MenuItem>
-                                                                                                                                                                                                                                              <MenuItem value={CONSTANTS.COOKED}>COOKED</MenuItem> */}
             </Select>
           </FormControl>
         </div>

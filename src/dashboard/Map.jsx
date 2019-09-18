@@ -10,6 +10,8 @@ import * as CONSTANTS from "../constants";
 
 // import { getDirections } from "../components/Directions";
 
+import MARKER_STYLE from "./marker-style";
+
 const TOKEN =
   "pk.eyJ1IjoiYWxjaHVhbmciLCJhIjoiY2swZGdxbWt3MDcxbTNocjBxYWlzMTN4aSJ9.l1B53WCC2Te-jLtMpVfyJg"; // Set your mapbox token here
 
@@ -26,7 +28,7 @@ class Map extends Component {
         longitude: -118.2439,
         zoom: 8.5,
         bearing: 0,
-        pitch: 0
+        pitch: 85
       },
       popupInfo: null
     };
@@ -43,7 +45,7 @@ class Map extends Component {
         longitude={order.longitude}
         latitude={order.latitude}
       >
-        <Pin
+        {/* <Pin
           size={20}
           customStyle={{
             fill:
@@ -56,7 +58,10 @@ class Map extends Component {
                 : "black"
           }}
           onClick={() => this.setState({ popupInfo: order })}
-        />
+        /> */}
+        <div className="station">
+          <span>{order.name}</span>
+        </div>
       </Marker>
     );
   };
@@ -69,7 +74,7 @@ class Map extends Component {
             style={{
               fill: "none",
               stroke: "grey",
-              strokeWidth: 6
+              strokeWidth: 4
             }}
             d={`M${points.join("L")}`}
           />
@@ -138,16 +143,11 @@ class Map extends Component {
 
   render() {
     const { viewport } = this.state;
-    const { orderMap, data } = this.props;
-
-    // let dataMap = data
-    //   .filter(
-    //     order =>
-    //       order.event_name === CONSTANTS.CREATED &&
-    //       order.latitude &&
-    //       order.longitude
-    //   )
-    //   .map(this._renderOrderMarker);
+    const { orderMap } = this.props;
+    const [
+      kitchenLongitude,
+      kitchenLatitude
+    ] = CONSTANTS.MAPBOX_KITCHEN_COORDINATES;
 
     const orderAdd =
       Object.entries(orderMap).length !== 0 && orderMap.constructor === Object
@@ -173,13 +173,18 @@ class Map extends Component {
           mapboxApiAccessToken={TOKEN}
           onStyleLoad={this._onStyleLoad}
         >
+          <style>{MARKER_STYLE}</style>
           <SVGOverlay redraw={this._redrawSVGOverlay} />,
           <CanvasOverlay redraw={this._redrawCanvasOverlay} />
-          <Marker key={`kitchen`} longitude={-118.461708} latitude={34.009408}>
+          <Marker
+            key={`kitchen`}
+            longitude={kitchenLongitude}
+            latitude={kitchenLatitude}
+          >
             <Pin
               size={20}
               customStyle={{
-                fill: "MAGENTA",
+                fill: "magenta",
                 stroke: "none",
                 strokeWidth: "2"
               }}
@@ -188,7 +193,6 @@ class Map extends Component {
           {orderAdd}
           {this._renderPopup()}
         </MapGL>
-        {/* {dataMap} */}
       </React.Fragment>
     );
   }

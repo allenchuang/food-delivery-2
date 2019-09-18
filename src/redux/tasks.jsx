@@ -158,7 +158,13 @@ const createSocketChannel = socket =>
 
         let longitude = json.features[0].geometry.coordinates[0];
         let latitude = json.features[0].geometry.coordinates[1];
-        let directionsUrl = `${CONSTANTS.MAPBOX_DIRECTIONS_URL}${CONSTANTS.MAPBOX_KITCHEN_COORDINATES};${longitude},${latitude}?geometries=geojson&access_token=${CONSTANTS.MAPBOX_TOKEN}`;
+        let directionsUrl = `${
+          CONSTANTS.MAPBOX_DIRECTIONS_URL
+        }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
+          ","
+        )};${longitude},${latitude}?geometries=geojson&access_token=${
+          CONSTANTS.MAPBOX_TOKEN
+        }`;
         const directionsResponse = await fetch(directionsUrl);
         const directionsJson = await directionsResponse.json();
 
