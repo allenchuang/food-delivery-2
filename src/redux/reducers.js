@@ -32,7 +32,7 @@ const handleSubscription = (state, action) => {
     }
   }
 
-  console.log("ordermap", orderMap);
+  // console.log("ordermap", orderMap);
   return {
     ...state,
     serverOnline: true,
@@ -129,6 +129,8 @@ export default (state = initialState, action) => {
       return handleFilterBySec(state, action);
     case ACTIONS.UPDATE_ORDER:
       return handleUpdateOrder(state, action);
+    case ACTIONS.RESET_STORE:
+      return initialState;
     default:
       return state;
   }

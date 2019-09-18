@@ -13,11 +13,12 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
+import DeleteIcon from "@material-ui/icons/Delete";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import Tooltip from "@material-ui/core/Tooltip";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
-import { mainListItems } from "./listItems";
+import MainListItems from "./NavList";
 import Chart from "./Chart";
 import ServerStatus from "./ServerStatus";
 import Orders from "./Orders";
@@ -30,6 +31,8 @@ import { withStyles } from "@material-ui/core/styles";
 import Map from "./Map";
 
 import logo from "../logo-cloudkitchens.png";
+
+import Router from "../Router";
 
 function Copyright() {
   return (
@@ -152,7 +155,8 @@ class Dashboard extends React.Component {
       serverOnline,
       sec,
       startChannel,
-      stopChannel
+      stopChannel,
+      resetStore
     } = this.props;
     const { open } = this.state;
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -189,22 +193,31 @@ class Dashboard extends React.Component {
             >
               Cloud Kitchen Dashboard
             </Typography> */}
-            <Tooltip title="Start Server Data">
+            <Tooltip title="Initiate Socket">
               <IconButton
                 onClick={startChannel}
                 color="inherit"
-                aria-label="startServer"
+                aria-label="start socket channel"
               >
                 <PlayArrowIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Stop Server Data">
+            <Tooltip title="Terminate Socket">
               <IconButton
                 onClick={stopChannel}
                 color="inherit"
-                aria-label="stopServer"
+                aria-label="stop socket channel"
               >
                 <StopIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Reset Redux Store">
+              <IconButton
+                onClick={resetStore}
+                color="inherit"
+                aria-label="reset Redux Store"
+              >
+                <DeleteIcon />
               </IconButton>
             </Tooltip>
           </Toolbar>
@@ -222,20 +235,22 @@ class Dashboard extends React.Component {
             </IconButton>
           </div>
           <Divider />
-          <List>{mainListItems}</List>
+          <MainListItems />
         </Drawer>
+
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
+
+          <Router />
+          {/* <Grid container spacing={3}> */}
+          {/* Chart */}
+          {/* <Grid item xs={12} md={8} lg={9}>
                 <Paper className={fixedHeightPaper}>
                   <Chart />
                 </Paper>
-              </Grid>
-              {/* Server Status */}
-              <Grid item xs={12} md={4} lg={3}>
+              </Grid> */}
+          {/* Server Status */}
+          {/* <Grid item xs={12} md={4} lg={3}>
                 <Paper className={fixedHeightPaper}>
                   <ServerStatus
                     channelOnline={channelOnline}
@@ -243,19 +258,19 @@ class Dashboard extends React.Component {
                     serverOnline={serverOnline}
                   />
                 </Paper>
-              </Grid>
-              {/* Map */}
-              <Grid item xs={12}>
+              </Grid> */}
+          {/* Map */}
+          {/* <Grid item xs={12}>
                 <Map />
-              </Grid>
-              {/* Recent Orders */}
-              <Grid item xs={12}>
+              </Grid> */}
+          {/* Recent Orders */}
+          {/* <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Orders title="Active Orders" />
                 </Paper>
-              </Grid>
-            </Grid>
-          </Container>
+              </Grid> */}
+          {/* </Grid> */}
+          {/* </Container> */}
           <Copyright />
         </main>
       </div>
@@ -269,7 +284,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   startChannel: ACTIONS.startChannel,
-  stopChannel: ACTIONS.stopChannel
+  stopChannel: ACTIONS.stopChannel,
+  resetStore: ACTIONS.resetStore
 };
 
 export default compose(

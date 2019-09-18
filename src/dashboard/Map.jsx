@@ -20,6 +20,12 @@ function round(x, n) {
   return Math.round(x * tenN) / tenN;
 }
 class Map extends Component {
+  static defaultProps = {
+    width: "100%",
+    height: "480px",
+    mapStyle: "mapbox://styles/mapbox/light-v9"
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -143,7 +149,8 @@ class Map extends Component {
 
   render() {
     const { viewport } = this.state;
-    const { orderMap } = this.props;
+    const { orderMap, height, width, mapStyle } = this.props;
+    const MapGLProps = { height, width, mapStyle };
     const [
       kitchenLongitude,
       kitchenLatitude
@@ -166,12 +173,10 @@ class Map extends Component {
         <MapGL
           {...viewport}
           ref={reactMap => (this.reactMap = reactMap)}
-          width="100%"
-          height="480px"
-          mapStyle="mapbox://styles/mapbox/light-v9"
           onViewportChange={this._updateViewport}
           mapboxApiAccessToken={TOKEN}
           onStyleLoad={this._onStyleLoad}
+          {...MapGLProps}
         >
           <style>{MARKER_STYLE}</style>
           <SVGOverlay redraw={this._redrawSVGOverlay} />,

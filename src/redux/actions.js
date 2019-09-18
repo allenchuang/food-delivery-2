@@ -17,6 +17,8 @@ export const UPDATE_ORDER = "UPDATE_ORDER";
 
 export const GET_ORDERS_GEOCODE = "GET_ORDERS_GEOCODE";
 
+export const RESET_STORE = "RESET_STORE";
+
 // ACTION CREATORS
 
 // --- SOCKETS
@@ -28,6 +30,9 @@ export const stopChannel = () => ({
   type: STOP_CHANNEL
 });
 
+export const resetStore = () => ({
+  type: RESET_STORE
+});
 // --- ACTIVE ORDERS
 export const getActiveOrders = () => ({
   type: GET_ACTIVE_ORDERS
