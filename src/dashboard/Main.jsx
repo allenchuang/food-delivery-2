@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Paper } from "@material-ui/core";
-import Orders from "./Orders";
+import OrderTable from "./OrderTable";
 import Map from "./Map";
 import ServerStatus from "./ServerStatus";
 
@@ -29,7 +29,7 @@ export default function Main() {
       <Grid container spacing={3}>
         <Grid container item xs={12} md={6} spacing={1}>
           {/* Server Status */}
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Paper className={fixedHeightPaper}>
               <ServerStatus
               // channelOnline={channelOnline}
@@ -37,11 +37,11 @@ export default function Main() {
               // serverOnline={serverOnline}
               />
             </Paper>
-          </Grid>
+          </Grid> */}
           {/* Recent Orders */}
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <Orders title="Active Orders" />
+              <OrderTable title="Active Orders" />
             </Paper>
           </Grid>
         </Grid>

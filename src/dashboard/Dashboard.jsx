@@ -21,7 +21,7 @@ import StopIcon from "@material-ui/icons/Stop";
 import MainListItems from "./NavList";
 import Chart from "./Chart";
 import ServerStatus from "./ServerStatus";
-import Orders from "./Orders";
+import OrderTable from "./OrderTable";
 
 import { compose } from "redux";
 import { connect } from "react-redux";

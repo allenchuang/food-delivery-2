@@ -187,9 +187,9 @@ class Map extends Component {
             latitude={kitchenLatitude}
           >
             <Pin
-              size={20}
+              size={40}
               customStyle={{
-                fill: "magenta",
+                fill: "blue",
                 stroke: "none",
                 strokeWidth: "2"
               }}

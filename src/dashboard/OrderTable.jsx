@@ -19,8 +19,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
 import Toolbar from "@material-ui/core/Toolbar";
-import Modal from "@material-ui/core/Modal";
-import Button from "@material-ui/core/Button";
+import OrderPopup from "./OrderPopup";
 
 import { filterByType, filterBySec, updateOrder } from "../redux/actions";
 import * as CONSTANTS from "../constants";
@@ -60,41 +59,21 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function getModalStyle() {
-  const top = 50;
-  const left = 50;
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`
-  };
-}
-
-const Orders = ({
-  data,
-  sec,
+const OrderTable = ({
   activeOrders,
   title,
   filteredType,
   filteredSec,
   handleFilterByType,
-  handleFilterBySec,
-  handleUpdateOrder
+  handleFilterBySec
 }) => {
   const classes = useStyles();
-  const [modalStyle] = React.useState(getModalStyle);
   const [open, setOpen] = React.useState(false);
   const [editOrder, setEditOrder] = React.useState(null);
 
   const setModalState = state => {
     setOpen(state);
     if (state === false) setEditOrder(null);
-  };
-
-  const updateEventType = e => {
-    let newOrder = { ...editOrder, event_name: e.target.value };
-    setEditOrder(newOrder);
   };
 
   const results = activeOrders.map(order => (
@@ -127,43 +106,12 @@ const Orders = ({
   ));
   return (
     <React.Fragment>
-      <Modal
-        aria-labelledby="Edit Order Popup"
-        aria-describedby="Modifying an existing order"
+      <OrderPopup
         open={open}
-        onClose={() => setModalState(false)}
-      >
-        {editOrder && (
-          <div style={modalStyle} className={classes.paper}>
-            <h2>Edit Order</h2>
-            <p>{editOrder.id}</p>
-            <p>{editOrder.name}</p>
-            <div>
-              <Select value={editOrder.event_name} onChange={updateEventType}>
-                {CONSTANTS.ALL_EVENTS.map(event => {
-                  return (
-                    <MenuItem key={event} value={event}>
-                      {event}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  handleUpdateOrder({ ...editOrder, sent_at_second: sec });
-                  setModalState(false);
-                }}
-              >
-                Update Order
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
+        setModalState={setModalState}
+        editOrder={editOrder}
+        setEditOrder={setEditOrder}
+      />
 
       <Toolbar className={classes.root}>
         <div className={classes.title}>
@@ -236,11 +184,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   handleFilterByType: e => dispatch(filterByType(e.target.value)),
-  handleFilterBySec: e => dispatch(filterBySec(parseInt(e.target.value))),
-  handleUpdateOrder: order => dispatch(updateOrder(order))
+  handleFilterBySec: e => dispatch(filterBySec(parseInt(e.target.value)))
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Orders);
+)(OrderTable);

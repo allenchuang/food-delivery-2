@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Paper } from "@material-ui/core";
-import Orders from "./Orders";
+import OrderTable from "./OrderTable";
 import Chart from "./Chart";
 
 const useStyles = makeStyles(theme => ({
@@ -36,7 +36,7 @@ export default function OrderHistory() {
         {/* Recent Orders */}
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Orders title="Past Orders" />
+            <OrderTable title="Past Orders" />
           </Paper>
         </Grid>
       </Grid>

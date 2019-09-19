@@ -153,23 +153,26 @@ const createSocketChannel = socket =>
       let newOrder = { ...order };
       if (order.event_name === CONSTANTS.CREATED) {
         let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
-        const geoCodeResponse = await fetch(geoCodeUrl);
-        const json = await geoCodeResponse.json();
+        try {
+          const geoCodeResponse = await fetch(geoCodeUrl);
+          const json = await geoCodeResponse.json();
+          let longitude = json.features[0].geometry.coordinates[0];
+          let latitude = json.features[0].geometry.coordinates[1];
+          let directionsUrl = `${
+            CONSTANTS.MAPBOX_DIRECTIONS_URL
+          }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
+            ","
+          )};${longitude},${latitude}?geometries=geojson&access_token=${
+            CONSTANTS.MAPBOX_TOKEN
+          }`;
+          const directionsResponse = await fetch(directionsUrl);
+          const directionsJson = await directionsResponse.json();
 
-        let longitude = json.features[0].geometry.coordinates[0];
-        let latitude = json.features[0].geometry.coordinates[1];
-        let directionsUrl = `${
-          CONSTANTS.MAPBOX_DIRECTIONS_URL
-        }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
-          ","
-        )};${longitude},${latitude}?geometries=geojson&access_token=${
-          CONSTANTS.MAPBOX_TOKEN
-        }`;
-        const directionsResponse = await fetch(directionsUrl);
-        const directionsJson = await directionsResponse.json();
-
-        let directions = directionsJson.routes[0].geometry.coordinates;
-        newOrder = { ...order, latitude, longitude, directions };
+          let directions = directionsJson.routes[0].geometry.coordinates;
+          newOrder = { ...order, latitude, longitude, directions };
+        } catch (error) {
+          console.error(error);
+        }
       }
 
       emit({
