@@ -66,7 +66,7 @@ const OrderPopup = ({
           <p>{editOrder.name}</p>
           <div>
             <Select value={editOrder.event_name} onChange={updateEventType}>
-              {CONSTANTS.ALL_EVENTS.map(event => {
+              {CONSTANTS.ALL_ORDERS.map(event => {
                 return (
                   <MenuItem key={event} value={event}>
                     {event}

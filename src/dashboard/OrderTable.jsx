@@ -127,7 +127,7 @@ const OrderTable = ({
               inputProps={{ name: "filterBy", id: "filter" }}
             >
               <MenuItem value={"showAll"}> ALL</MenuItem>
-              {CONSTANTS.ALL_EVENTS.map(event => {
+              {CONSTANTS.ALL_ORDERS.map(event => {
                 return (
                   <MenuItem key={event} value={event}>
                     {event}
