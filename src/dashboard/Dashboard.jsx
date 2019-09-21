@@ -22,6 +22,7 @@ import MainListItems from "./NavList";
 import Chart from "./Chart";
 import ServerStatus from "./ServerStatus";
 import OrderTable from "./OrderTable";
+import { Hidden } from "@material-ui/core";
 
 import { compose } from "redux";
 import { connect } from "react-redux";
@@ -161,6 +162,18 @@ class Dashboard extends React.Component {
     const { open } = this.state;
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+    const drawerContent = (
+      <React.Fragment>
+        <div className={classes.toolbarIcon}>
+          <IconButton onClick={this.handleDrawerClose}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </div>
+        <Divider />
+        <MainListItems handleClose={this.handleDrawerClose} />
+      </React.Fragment>
+    );
+
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -222,21 +235,34 @@ class Dashboard extends React.Component {
             </Tooltip>
           </Toolbar>
         </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-          }}
-          open={open}
-        >
-          <div className={classes.toolbarIcon}>
-            <IconButton onClick={this.handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <MainListItems />
-        </Drawer>
+        <Hidden xsUp implementation="css">
+          <Drawer
+            variant="temporary"
+            classes={{
+              paper: clsx(
+                classes.drawerPaper,
+                !open && classes.drawerPaperClose
+              )
+            }}
+            open={open}
+          >
+            {drawerContent}
+          </Drawer>
+        </Hidden>
+        <Hidden xsDown>
+          <Drawer
+            variant="permanent"
+            classes={{
+              paper: clsx(
+                classes.drawerPaper,
+                !open && classes.drawerPaperClose
+              )
+            }}
+            open={open}
+          >
+            {drawerContent}
+          </Drawer>
+        </Hidden>
 
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />

@@ -12,9 +12,6 @@ import * as CONSTANTS from "../constants";
 
 import MARKER_STYLE from "./marker-style";
 
-const TOKEN =
-  "pk.eyJ1IjoiYWxjaHVhbmciLCJhIjoiY2swZGdxbWt3MDcxbTNocjBxYWlzMTN4aSJ9.l1B53WCC2Te-jLtMpVfyJg"; // Set your mapbox token here
-
 function round(x, n) {
   const tenN = Math.pow(10, n);
   return Math.round(x * tenN) / tenN;
@@ -51,23 +48,27 @@ class Map extends Component {
         longitude={order.longitude}
         latitude={order.latitude}
       >
-        {/* <Pin
-          size={20}
+        <Pin
+          className="station"
+          size={30}
           customStyle={{
             fill:
               order.event_name === CONSTANTS.DELIVERED
-                ? "green"
+                ? "#81ff00"
                 : order.event_name === CONSTANTS.COOKED
-                ? "orange"
+                ? "#ff803e"
                 : order.event_name === CONSTANTS.DRIVER_RECEIVED
-                ? "blue"
-                : "black"
+                ? "#78ecb8"
+                : order.event_name === CONSTANTS.CANCELLED
+                ? "red"
+                : "#eadd04"
           }}
           onClick={() => this.setState({ popupInfo: order })}
-        /> */}
-        <div className="station">
+        />
+        {/* <span style={{ fontWeight: "bold" }}>{order.name}</span> */}
+        {/* <div className="station">
           <span>{order.name}</span>
-        </div>
+        </div> */}
       </Marker>
     );
   };
@@ -134,7 +135,7 @@ class Map extends Component {
     return (
       popupInfo && (
         <Popup
-          tipSize={5}
+          tipSize={20}
           anchor="top"
           longitude={popupInfo.longitude}
           latitude={popupInfo.latitude}
@@ -174,7 +175,7 @@ class Map extends Component {
           {...viewport}
           ref={reactMap => (this.reactMap = reactMap)}
           onViewportChange={this._updateViewport}
-          mapboxApiAccessToken={TOKEN}
+          mapboxApiAccessToken={CONSTANTS.MAPBOX_TOKEN}
           onStyleLoad={this._onStyleLoad}
           {...MapGLProps}
         >

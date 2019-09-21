@@ -1,36 +1,77 @@
-import * as CONSTANTS from '../constants'
+import createCachedSelector from "re-reselect";
+import * as CONSTANTS from "../constants";
 
-export function historicalDataSelector (state = {}) {
-  const { data, filteredType, filteredSec, sec } = state
+// Get sec
+const getSec = state => state.sec;
 
-  const cutOffSec = filteredSec ? sec - filteredSec : 0 // we want to filter out events greater than cutoff
-  let result = filteredType
-    ? data.filter(order => order.event_name === filteredType)
-    : data
+// ORDER TYPE SELECTORS
+const getAllOrders = state => state.data;
+const getActiveOrders = state =>
+  Object.values(state.orderMap)
+    .filter(order => CONSTANTS.ACTIVE_ORDERS_EVENTS.includes(order.event_name))
+    .sort((a, b) => b.sent_at_second - a.sent_at_second);
+const getInactiveOrders = state =>
+  Object.values(state.orderMap)
+    .filter(order =>
+      CONSTANTS.INACTIVE_ORDERS_EVENTS.includes(order.event_name)
+    )
+    .sort((a, b) => b.sent_at_second - a.sent_at_second);
 
-  if (filteredType === CONSTANTS.COOKED && filteredSec > 0) {
-    result = result.filter(order => order.sent_at_second > cutOffSec)
+const getDataByOrderType = (state, orderType) => {
+  switch (orderType) {
+    case CONSTANTS.ALL_ORDERS:
+      return getAllOrders(state);
+    case CONSTANTS.ACTIVE_ORDERS:
+      return getActiveOrders(state);
+    case CONSTANTS.INACTIVE_ORDERS:
+      return getInactiveOrders(state);
+    default:
+      return getAllOrders(state);
   }
-  return result
-}
+};
 
-export function activeOrdersSelector (state = {}) {
-  const { data, filteredType, filteredSec, sec } = state
+// Get Filters by Order Table
+export const mapOrderTypesToKey = {
+  [CONSTANTS.ALL_ORDERS]: "filterAll",
+  [CONSTANTS.ACTIVE_ORDERS]: "filterActive",
+  [CONSTANTS.INACTIVE_ORDERS]: "filterInactive"
+};
 
-  const cutOffSec = filteredSec ? sec - filteredSec : 0 // we want to filter out events greater than cutoff
-  let result = filteredType
-    ? data.filter(order => order.event_name === filteredType)
-    : data
+const getFilterKeyByOrderType = orderType => mapOrderTypesToKey[orderType];
 
-  if (filteredType === CONSTANTS.COOKED && filteredSec > 0) {
-    result = result.filter(order => order.sent_at_second > cutOffSec)
+const filterEventByOrderType = (state, orderType) => {
+  return state[getFilterKeyByOrderType(orderType)].event;
+};
+
+const filterSecByOrderType = (state, orderType) => {
+  return state[getFilterKeyByOrderType(orderType)].sec;
+};
+
+const filterHelper = (orders, filterEvent, filterSec, sec) => {
+  const cutOffSec = filterSec ? sec - filterSec : 0; // we want to filter out events greater than cutoff
+  let filteredOrders = filterEvent
+    ? orders.filter(order => order.event_name === filterEvent)
+    : orders;
+
+  if (filterEvent === CONSTANTS.COOKED && filterSec > 0) {
+    filteredOrders = filteredOrders.filter(
+      order => order.sent_at_second > cutOffSec
+    );
   }
-  return result
-}
+  return filteredOrders;
+};
 
-// activeOrders = Object.values(orderMap)
-//   .filter(order => CONSTANTS.ACTIVE_ORDERS.includes(order.event_name))
-//   .sort((a, b) => b.sent_at_second - a.sent_at_second)
-// inactiveOrders = Object.values(orderMap)
-//   .filter(order => CONSTANTS.INACTIVE_ORDERS.includes(order.event_name))
-//   .sort((a, b) => b.sent_at_second - a.sent_at_second)
+export const getOrdersWithFilters = createCachedSelector(
+  // input selectors
+  getDataByOrderType,
+  filterEventByOrderType,
+  filterSecByOrderType,
+  getSec,
+
+  // result func
+  (orders, filterEvent, filterSec, sec) =>
+    filterHelper(orders, filterEvent, filterSec, sec)
+)(
+  // re-reselect keySelector
+  (orders, filterEvent, filterSec, sec) => `${sec}@${filterEvent}:${filterSec}` // cacheKey don't repeat for live data
+);

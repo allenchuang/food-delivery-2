@@ -93,14 +93,20 @@ const listenServerSaga = function*() {
       socket: call(connect),
       timeout: delay(5000)
     });
+    // if more than 5 sec
     if (timeout) {
       yield put({ type: ACTIONS.SERVER_OFF });
       socket.disconnect(true);
     }
     const socketChannel = yield call(createSocketChannel, socket);
+
+    // writing data back to server
     yield fork(listenWriteSaga, socket);
+
+    // listen for socket disconnect / reconnect
     yield fork(listenDisconnectSaga, socket);
     yield fork(listenReconnectSaga, socket);
+
     yield put({ type: ACTIONS.SERVER_ON });
 
     while (true) {
@@ -117,33 +123,9 @@ const listenServerSaga = function*() {
     if (yield cancelled()) {
       socket && socket.disconnect(true);
       yield put({ type: ACTIONS.CHANNEL_OFF });
+      yield put({ type: ACTIONS.SERVER_OFF });
     }
   }
-};
-
-const getGeocode = order => {
-  // if (order.event_name === CONSTANTS.CREATED) {
-  let url = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
-  return fetch(url)
-    .then(res => {
-      if (res.ok) {
-        return res.json();
-      } else {
-        throw new Error("Fetch to MapBox Geocoder failed");
-      }
-    })
-    .then(res => {
-      // append lat / long coordinates
-      let latitude = res.features[0].center[0],
-        longitude = res.features[0].center[1];
-      console.log("order", latitude);
-      return {
-        ...order,
-        latitude,
-        longitude
-      };
-    })
-    .catch(error => console.log(error));
 };
 
 // This is how channel is created

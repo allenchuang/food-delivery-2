@@ -24,6 +24,7 @@ function NavList(props) {
             to={route.path}
             selected={activeRoute(route.path)}
             button
+            onClick={props.handleClose}
           >
             <ListItemIcon>
               <route.icon />
@@ -32,24 +33,6 @@ function NavList(props) {
           </ListItem>
         );
       })}
-      {/* <ListItem component={Link} to="/" button selected>
-        <ListItemIcon>
-          <HomeIcon />
-        </ListItemIcon>
-        <ListItemText primary="Dashboard" />
-      </ListItem>
-      <ListItem component={Link} to="/history" button>
-        <ListItemIcon>
-          <ShoppingCartIcon />
-        </ListItemIcon>
-        <ListItemText primary="Order History" />
-      </ListItem>
-      <ListItem component={Link} to="/map" button>
-        <ListItemIcon>
-          <DriveEtaIcon />
-        </ListItemIcon>
-        <ListItemText primary="Delivery Map" />
-      </ListItem> */}
     </List>
   );
 }

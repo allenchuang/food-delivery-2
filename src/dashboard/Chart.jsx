@@ -32,7 +32,7 @@ function createData(data, sec) {
 }
 
 const Chart = ({ data, sec }) => {
-  const results = createData(data, sec);
+  const results = createData(data, sec) || {};
   return (
     <React.Fragment>
       <Title>Today</Title>
@@ -71,9 +71,6 @@ const mapStateToProps = state => ({
   sec: state.sec
 });
 
-const mapDispatchToProps = dispatch => {};
+// const mapDispatchToProps = dispatch => {};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Chart);
+export default connect(mapStateToProps)(Chart);

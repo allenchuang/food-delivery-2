@@ -7,13 +7,24 @@ import { Paper } from "@material-ui/core";
 import OrderTable from "./OrderTable";
 import Map from "./Map";
 import ServerStatus from "./ServerStatus";
+import Hidden from "@material-ui/core/Hidden";
+import * as CONSTANTS from "../constants";
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4)
+  },
   paper: {
     padding: theme.spacing(2),
     display: "flex",
     overflow: "auto",
-    flexDirection: "column"
+    flexDirection: "column",
+    height: "40vh",
+    minHeight: "40vh",
+    [theme.breakpoints.down("md")]: {
+      height: "80vh"
+    }
   },
   fixedHeight: {
     height: 240
@@ -25,7 +36,6 @@ export default function Main() {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
     <Container maxWidth="xl" className={classes.container}>
-      <h1>MAIN</h1>
       <Grid container spacing={3}>
         <Grid container item xs={12} md={6} spacing={1}>
           {/* Server Status */}
@@ -41,14 +51,27 @@ export default function Main() {
           {/* Recent Orders */}
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <OrderTable title="Active Orders" />
+              <OrderTable
+                orderType={CONSTANTS.ACTIVE_ORDERS}
+                title="Active Orders"
+              />
             </Paper>
           </Grid>
+          <Hidden mdDown>
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>
+                <OrderTable
+                  orderType={CONSTANTS.INACTIVE_ORDERS}
+                  title="Inactive Orders"
+                />
+              </Paper>
+            </Grid>
+          </Hidden>
         </Grid>
         <Grid container item xs={12} md={6} spacing={1}>
           {/* Map */}
           <Grid item xs={12}>
-            <Map />
+            <Map height={"80vh"} />
           </Grid>
           {/* Server Status */}
         </Grid>

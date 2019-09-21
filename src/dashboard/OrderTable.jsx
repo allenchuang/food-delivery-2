@@ -19,11 +19,12 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
 import Toolbar from "@material-ui/core/Toolbar";
+import Hidden from "@material-ui/core/Hidden";
 import OrderPopup from "./OrderPopup";
 
-import { filterByType, filterBySec, updateOrder } from "../redux/actions";
+import { filterEventByOrderType, filterSecByOrderType } from "../redux/actions";
 import * as CONSTANTS from "../constants";
-import { activeOrdersSelector } from "../redux/selectors";
+import { getOrdersWithFilters, mapOrderTypesToKey } from "../redux/selectors";
 
 import { colorEventType } from "../utils";
 
@@ -56,12 +57,38 @@ const useStyles = makeStyles(theme => ({
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3)
+  },
+  tableWrapper: {
+    maxHeight: "80%",
+    overflowY: "auto"
+  },
+  orderId: {
+    color: "grey",
+    display: "block"
+  },
+  orderCol: {
+    width: "33%",
+    minWidth: "200px"
+  },
+  eventCol: {
+    minWidth: "120px"
+  },
+  eventLabel: { fontWeight: "bold", padding: "4px" },
+  destinationCol: {
+    [theme.breakpoints.down("md")]: {
+      whiteSpace: "nowrap"
+    }
+  },
+  editBtn: {
+    fontWeight: "bold",
+    border: "1px black dotted"
   }
 }));
 
 const OrderTable = ({
-  activeOrders,
   title,
+  orderType,
+  activeOrders,
   filteredType,
   filteredSec,
   handleFilterByType,
@@ -76,24 +103,45 @@ const OrderTable = ({
     if (state === false) setEditOrder(null);
   };
 
+  const onFilterEvent = e => handleFilterByType(orderType)(e.target.value);
+  const onFilterSec = e =>
+    handleFilterBySec(orderType)(parseInt(e.target.value));
+
   const results = activeOrders.map(order => (
     <TableRow
+      hover
       key={`${order.id}-${order.name}-${order.event_name}-${
         order.sent_at_second
       }-${new Date().getTime()}`}
     >
-      <TableCell>{order.id}</TableCell>
-      <TableCell>{order.name}</TableCell>
+      {/* <TableCell>{order.id}</TableCell> */}
       <TableCell>
-        <span style={colorEventType(order.event_name)}>{order.event_name}</span>
+        <small className={classes.orderId}>{order.id}</small>
+        <b>{order.name}</b>
+      </TableCell>
+      <TableCell>
+        <small
+          className={classes.eventLabel}
+          style={colorEventType(order.event_name)}
+        >
+          {order.event_name}
+        </small>
       </TableCell>
       <TableCell>{order.sent_at_second}</TableCell>
-      <TableCell>
-        {order.latitude}-{order.longitude}
+      {orderType === CONSTANTS.ALL_ORDERS && (
+        <Hidden mdDown>
+          <TableCell>
+            {order.latitude}-{order.longitude}
+          </TableCell>
+        </Hidden>
+      )}
+
+      <TableCell className={classes.destinationCol} align="right">
+        {order.destination}
       </TableCell>
-      <TableCell align="right">{order.destination}</TableCell>
       <TableCell align="right">
         <button
+          className={classes.editBtn}
           onClick={() => {
             setEditOrder(order);
             setModalState(true);
@@ -117,17 +165,19 @@ const OrderTable = ({
         <div className={classes.title}>
           <Title>{title}</Title>
         </div>
-        <div className={classes.spacer} />
+        <Hidden mdDown>
+          <div className={classes.spacer} />
+        </Hidden>
         <div>
           <FormControl className={classes.formControl}>
             <InputLabel htmlFor="filter">Filter By</InputLabel>
             <Select
-              value={filteredType}
-              onChange={handleFilterByType}
+              value={filteredType || ""}
+              onChange={onFilterEvent}
               inputProps={{ name: "filterBy", id: "filter" }}
             >
-              <MenuItem value={"showAll"}> ALL</MenuItem>
-              {CONSTANTS.ALL_ORDERS.map(event => {
+              <MenuItem value={""}> ALL</MenuItem>
+              {CONSTANTS[`${orderType}_EVENTS`].map(event => {
                 return (
                   <MenuItem key={event} value={event}>
                     {event}
@@ -141,29 +191,36 @@ const OrderTable = ({
           <TextField
             id="standard-number"
             label="Seconds"
-            value={filteredSec}
-            defaultValue={0}
-            onChange={handleFilterBySec}
+            value={filteredSec || ""}
+            onChange={onFilterSec}
             type="number"
             className={classes.textField}
             InputLabelProps={{ shrink: true }}
           />
         )}
       </Toolbar>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Food Name</TableCell>
-            <TableCell>Event</TableCell>
-            <TableCell>Secs</TableCell>
-            <TableCell>Lat-Long</TableCell>
-            <TableCell align="right">Destination</TableCell>
-            <TableCell align="center">Edit</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>{results}</TableBody>
-      </Table>
+      <div className={classes.tableWrapper}>
+        <Table stickyHeader={true} size="small">
+          <TableHead>
+            <TableRow>
+              {/* <TableCell>ID</TableCell> */}
+              <TableCell className={classes.orderCol}>Order</TableCell>
+              <TableCell className={classes.eventCol}>Event</TableCell>
+              <TableCell>Secs</TableCell>
+              {orderType === CONSTANTS.ALL_ORDERS && (
+                <Hidden mdDown>
+                  <TableCell>Lat-Long</TableCell>
+                </Hidden>
+              )}
+              <TableCell align="right">Destination</TableCell>
+              <TableCell colSpan={1} align="center">
+                Edit
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>{results}</TableBody>
+        </Table>
+      </div>
       <div className={classes.seeMore}>
         <Link color="primary" href="#">
           {" "}
@@ -174,17 +231,17 @@ const OrderTable = ({
   );
 };
 
-const mapStateToProps = state => ({
-  activeOrders: activeOrdersSelector(state),
-  data: state.data,
-  filteredType: state.filteredType,
-  filteredSec: state.filteredSec,
-  sec: state.sec
+const mapStateToProps = (state, ownProps) => ({
+  activeOrders: getOrdersWithFilters(state, CONSTANTS[ownProps.orderType]),
+  filteredType: state[mapOrderTypesToKey[ownProps.orderType]].event,
+  filteredSec: state[mapOrderTypesToKey[ownProps.orderType]].sec
 });
 
-const mapDispatchToProps = dispatch => ({
-  handleFilterByType: e => dispatch(filterByType(e.target.value)),
-  handleFilterBySec: e => dispatch(filterBySec(parseInt(e.target.value)))
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  handleFilterByType: orderType => e =>
+    dispatch(filterEventByOrderType(orderType)(e)),
+  handleFilterBySec: orderType => e =>
+    dispatch(filterSecByOrderType(orderType)(e))
 });
 
 export default connect(

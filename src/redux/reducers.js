@@ -1,17 +1,8 @@
+import { combineReducers } from "redux";
+import initialState from "./initialState";
+import { filterAll, filterActive, filterInactive } from "./filtersReducer";
 import * as ACTIONS from "./actions";
 import * as CONSTANTS from "../constants";
-
-const initialState = {
-  data: [],
-  activeOrders: [],
-  inactiveOrders: [],
-  orderMap: {},
-  sec: 0,
-  channelOnline: false,
-  serverOnline: undefined,
-  filteredType: "",
-  filteredSec: ""
-};
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
@@ -19,17 +10,17 @@ const handleSubscription = (state, action) => {
     orderMap = { ...state.orderMap };
   if (Object.keys(order).length !== 0) {
     data.unshift(order);
-    if (order.event_name === CONSTANTS.CANCELLED) {
-      delete orderMap[order.id];
-    } else {
-      orderMap[order.id] = orderMap[order.id]
-        ? {
-            ...orderMap[order.id],
-            event_name: order.event_name,
-            sent_at_second: order.sent_at_second
-          }
-        : order;
-    }
+    // if (order.event_name === CONSTANTS.CANCELLED) {
+    //   delete orderMap[order.id];
+    // } else {
+    orderMap[order.id] = orderMap[order.id]
+      ? {
+          ...orderMap[order.id],
+          event_name: order.event_name,
+          sent_at_second: order.sent_at_second
+        }
+      : order;
+    // }
   }
 
   // console.log("ordermap", orderMap);
@@ -42,40 +33,6 @@ const handleSubscription = (state, action) => {
     // Moved logic to selectors.js
     // activeOrders,
     // inactiveOrders
-  };
-};
-
-const handleFilterByType = (state, action) => {
-  const { eventType } = action;
-  switch (eventType) {
-    case "showAll":
-      return {
-        ...state,
-        filteredType: null
-      };
-    case CONSTANTS.CREATED:
-      return {
-        ...state,
-        filteredType: CONSTANTS.CREATED
-      };
-    case CONSTANTS.COOKED:
-      return {
-        ...state,
-        filteredType: CONSTANTS.COOKED
-      };
-    default:
-      return {
-        ...state,
-        filteredType: eventType
-      };
-  }
-};
-
-const handleFilterBySec = (state, action) => {
-  const { secTilNow } = action;
-  return {
-    ...state,
-    filteredSec: secTilNow
   };
 };
 
@@ -106,27 +63,18 @@ const handleUpdateOrder = (state, action) => {
   };
 };
 
-export default (state = initialState, action) => {
+const oldReducer = (state = initialState, action) => {
   switch (action.type) {
     case ACTIONS.CHANNEL_ON:
       return { ...state, channelOnline: true };
     case ACTIONS.CHANNEL_OFF:
-      return {
-        ...state,
-        channelOnline: false,
-        serverOnline: undefined,
-        sec: 0
-      };
+      return { ...state, channelOnline: false };
     case ACTIONS.SERVER_OFF:
       return { ...state, serverOnline: false };
     case ACTIONS.SERVER_ON:
       return { ...state, serverOnline: true };
     case ACTIONS.SUBSCRIBE_TIMER:
       return handleSubscription(state, action);
-    case ACTIONS.FILTER_ACTIVE_ORDERS_TYPE:
-      return handleFilterByType(state, action);
-    case ACTIONS.FILTER_ACTIVE_ORDERS_SEC:
-      return handleFilterBySec(state, action);
     case ACTIONS.UPDATE_ORDER:
       return handleUpdateOrder(state, action);
     case ACTIONS.RESET_STORE:
@@ -135,3 +83,32 @@ export default (state = initialState, action) => {
       return state;
   }
 };
+
+// export default (state = initialState, action) => {
+
+// };
+
+export default function(state = initialState, action) {
+  return {
+    ...oldReducer(state, action),
+    filterAll: filterAll(state.filterAll, action),
+    filterActive: filterActive(state.filterActive, action),
+    filterInactive: filterInactive(state.filterInactive, action)
+  };
+}
+
+// export default combineReducers({
+//   ...oldReducer,
+//   filterAll,
+//   filterActive
+// });
+
+// function createReducer(initialState, handlers) {
+//   return function reducer(state = initialState, action) {
+//     if (handlers.hasOwnProperty(action.type)) {
+//       return handlers[action.type](state, action)
+//     } else {
+//       return state
+//     }
+//   }
+// }

@@ -59,14 +59,14 @@ const OrderPopup = ({
       open={open}
       onClose={() => setModalState(false)}
     >
-      {editOrder && (
+      {editOrder ? (
         <div style={modalStyle} className={classes.paper}>
           <h2>Edit Order</h2>
           <p>{editOrder.id}</p>
           <p>{editOrder.name}</p>
           <div>
             <Select value={editOrder.event_name} onChange={updateEventType}>
-              {CONSTANTS.ALL_ORDERS.map(event => {
+              {CONSTANTS.ALL_ORDERS_EVENTS.map(event => {
                 return (
                   <MenuItem key={event} value={event}>
                     {event}
@@ -88,6 +88,8 @@ const OrderPopup = ({
             </Button>
           </div>
         </div>
+      ) : (
+        <p>No data</p>
       )}
     </Modal>
   );

@@ -6,8 +6,13 @@ import Grid from "@material-ui/core/Grid";
 import { Paper } from "@material-ui/core";
 import OrderTable from "./OrderTable";
 import Chart from "./Chart";
+import * as CONSTANTS from "../constants";
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4)
+  },
   paper: {
     padding: theme.spacing(2),
     display: "flex",
@@ -15,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "column"
   },
   fixedHeight: {
-    height: 240
+    height: 190
   }
 }));
 
@@ -24,8 +29,6 @@ export default function OrderHistory() {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
     <Container maxWidth="xl" className={classes.container}>
-      <h1>ORDER HISTORY</h1>
-
       <Grid container spacing={3}>
         {/* Chart */}
         <Grid item xs={12}>
@@ -36,7 +39,7 @@ export default function OrderHistory() {
         {/* Recent Orders */}
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <OrderTable title="Past Orders" />
+            <OrderTable orderType={CONSTANTS.ALL_ORDERS} title="Past Orders" />
           </Paper>
         </Grid>
       </Grid>
