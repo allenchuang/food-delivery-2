@@ -1,5 +1,10 @@
-// express
 const express = require("express");
+const http = require("http");
+const socketIO = require("socket.io");
+const fs = require("fs");
+const uuid = require("uuid/v1");
+
+// Set up Express
 const app = express();
 const port = process.env.PORT || 4001;
 
@@ -9,13 +14,14 @@ app.use("/", (req, res) => {
 });
 
 // http server
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
+const server = http.createServer(app);
+
+// socket
+const io = socketIO(server, {
   pingInterval: 1000 // interval of 1 second for consistent counting
 });
 
 // load in local data
-const fs = require("fs");
 const data = JSON.parse(fs.readFileSync("./mock/challenge_data.json", "utf8"));
 
 // server listen
@@ -37,7 +43,8 @@ io.on("connection", socket => {
       if (events.length > 0) {
         let event;
         for (event of events) {
-          io.sockets.emit("newOrder", event, sec);
+          let newEvent = Object.assign({}, event, { uid: uuid() });
+          io.sockets.emit("newOrder", newEvent, sec);
           console.log(event);
         }
       } else {

@@ -11,6 +11,7 @@ import * as CONSTANTS from "../constants";
 // import { getDirections } from "../components/Directions";
 
 import MARKER_STYLE from "./marker-style";
+// import "../styles/mapbox-overrides.css";
 
 function round(x, n) {
   const tenN = Math.pow(10, n);
@@ -139,10 +140,10 @@ class Map extends Component {
           anchor="top"
           longitude={popupInfo.longitude}
           latitude={popupInfo.latitude}
-          closeOnClick={false}
+          closeOnClick={true}
           onClose={() => this.setState({ popupInfo: null })}
         >
-          <OrderInfo info={popupInfo} />
+          <OrderInfo order={popupInfo} />
         </Popup>
       )
     );
@@ -158,17 +159,16 @@ class Map extends Component {
     ] = CONSTANTS.MAPBOX_KITCHEN_COORDINATES;
 
     const orderAdd =
-      Object.entries(orderMap).length !== 0 && orderMap.constructor === Object
-        ? Object.keys(orderMap)
-            .filter(
-              orderId =>
-                orderMap[orderId].latitude && orderMap[orderId].longitude
-            )
-            .map(orderId => {
-              return this._renderOrderMarker(orderMap[orderId], orderId);
-              // }
-            })
-        : "";
+      Object.entries(orderMap).length !== 0 &&
+      orderMap.constructor === Object &&
+      Object.keys(orderMap)
+        .filter(
+          orderId => orderMap[orderId].latitude && orderMap[orderId].longitude
+        )
+        .map(orderId => {
+          return this._renderOrderMarker(orderMap[orderId], orderId);
+          // }
+        });
     return (
       <React.Fragment>
         <MapGL

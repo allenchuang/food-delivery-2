@@ -237,7 +237,7 @@ class Dashboard extends React.Component {
         </AppBar>
         <Hidden xsUp implementation="css">
           <Drawer
-            variant="temporary"
+            onClose={this.handleDrawerClose}
             classes={{
               paper: clsx(
                 classes.drawerPaper,

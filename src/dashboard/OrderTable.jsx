@@ -108,12 +108,7 @@ const OrderTable = ({
     handleFilterBySec(orderType)(parseInt(e.target.value));
 
   const results = activeOrders.map(order => (
-    <TableRow
-      hover
-      key={`${order.id}-${order.name}-${order.event_name}-${
-        order.sent_at_second
-      }-${new Date().getTime()}`}
-    >
+    <TableRow hover key={order.uid}>
       {/* <TableCell>{order.id}</TableCell> */}
       <TableCell>
         <small className={classes.orderId}>{order.id}</small>

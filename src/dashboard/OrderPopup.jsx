@@ -19,6 +19,13 @@ const useStyles = makeStyles(theme => ({
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3)
+  },
+  finePrint: {
+    color: "grey",
+    display: "block"
+  },
+  orderName: {
+    fontWeight: "bold"
   }
 }));
 
@@ -61,9 +68,9 @@ const OrderPopup = ({
     >
       {editOrder ? (
         <div style={modalStyle} className={classes.paper}>
-          <h2>Edit Order</h2>
-          <p>{editOrder.id}</p>
-          <p>{editOrder.name}</p>
+          <h4>Edit Order</h4>
+          <small className={classes.finePrint}>{editOrder.id}</small>
+          <p className={classes.orderName}>{editOrder.name}</p>
           <div>
             <Select value={editOrder.event_name} onChange={updateEventType}>
               {CONSTANTS.ALL_ORDERS_EVENTS.map(event => {
