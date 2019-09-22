@@ -132,7 +132,10 @@ const listenServerSaga = function*() {
 const createSocketChannel = socket =>
   eventChannel(emit => {
     const newOrderHandler = async (order, sec) => {
-      let newOrder = { ...order };
+      let newOrder = Object.assign({}, order);
+      // Condition to fetch for Destination Geocode / Routes
+      // TODO: Will have to include scenario for updating address,
+      // i.e. only fetch when new order is created or order address has been updated
       if (order.event_name === CONSTANTS.CREATED) {
         let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
         try {
@@ -157,6 +160,7 @@ const createSocketChannel = socket =>
         }
       }
 
+      // if no fetch required, emit back the same order object.
       emit({
         order: newOrder,
         sec
