@@ -8,9 +8,7 @@ import OrderInfo from "../components/OrderInfo";
 
 import * as CONSTANTS from "../constants";
 
-// import { getDirections } from "../components/Directions";
-
-import MARKER_STYLE from "./marker-style";
+import MARKER_STYLE from "../styles/marker-style";
 // import "../styles/mapbox-overrides.css";
 
 function round(x, n) {

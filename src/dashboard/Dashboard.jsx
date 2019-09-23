@@ -4,13 +4,9 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -19,20 +15,12 @@ import Tooltip from "@material-ui/core/Tooltip";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
 import MainListItems from "./NavList";
-import Chart from "./Chart";
-import ServerStatus from "./ServerStatus";
-import OrderTable from "./OrderTable";
 import { Hidden } from "@material-ui/core";
-
 import { compose } from "redux";
 import { connect } from "react-redux";
 import * as ACTIONS from "../redux/actions";
 import { withStyles } from "@material-ui/core/styles";
-
-import Map from "./Map";
-
-import logo from "../logo-cloudkitchens.png";
-
+import logo from "../images/logo-cloudkitchens.png";
 import Router from "../Router";
 
 function Copyright() {
@@ -132,7 +120,7 @@ const styles = theme => ({
   }
 });
 
-class Dashboard extends React.Component {
+export class Dashboard extends React.Component {
   state = {
     open: false
   };
@@ -150,17 +138,8 @@ class Dashboard extends React.Component {
   }
 
   render() {
-    const {
-      classes,
-      channelOnline,
-      serverOnline,
-      sec,
-      startChannel,
-      stopChannel,
-      resetStore
-    } = this.props;
+    const { classes, startChannel, stopChannel, resetStore } = this.props;
     const { open } = this.state;
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     const drawerContent = (
       <React.Fragment>
@@ -197,15 +176,6 @@ class Dashboard extends React.Component {
             <div className={classes.title}>
               <img src={logo} alt="Cloud Kitchens Dashboard" height={55} />
             </div>
-            {/* <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              Cloud Kitchen Dashboard
-            </Typography> */}
             <Tooltip title="Initiate Socket">
               <IconButton
                 onClick={startChannel}
@@ -268,45 +238,12 @@ class Dashboard extends React.Component {
           <div className={classes.appBarSpacer} />
 
           <Router />
-          {/* <Grid container spacing={3}> */}
-          {/* Chart */}
-          {/* <Grid item xs={12} md={8} lg={9}>
-                <Paper className={fixedHeightPaper}>
-                  <Chart />
-                </Paper>
-              </Grid> */}
-          {/* Server Status */}
-          {/* <Grid item xs={12} md={4} lg={3}>
-                <Paper className={fixedHeightPaper}>
-                  <ServerStatus
-                    channelOnline={channelOnline}
-                    sec={sec}
-                    serverOnline={serverOnline}
-                  />
-                </Paper>
-              </Grid> */}
-          {/* Map */}
-          {/* <Grid item xs={12}>
-                <Map />
-              </Grid> */}
-          {/* Recent Orders */}
-          {/* <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <Orders title="Active Orders" />
-                </Paper>
-              </Grid> */}
-          {/* </Grid> */}
-          {/* </Container> */}
           <Copyright />
         </main>
       </div>
     );
   }
 }
-
-const mapStateToProps = state => ({
-  ...state
-});
 
 const mapDispatchToProps = {
   startChannel: ACTIONS.startChannel,
@@ -317,7 +254,7 @@ const mapDispatchToProps = {
 export default compose(
   withStyles(styles),
   connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
   )
 )(Dashboard);

@@ -1,14 +1,12 @@
-import React from "react";
-import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
+import { Paper } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import { Paper } from "@material-ui/core";
-import OrderTable from "./OrderTable";
-import Map from "./Map";
-import ServerStatus from "./ServerStatus";
 import Hidden from "@material-ui/core/Hidden";
+import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
 import * as CONSTANTS from "../constants";
+import Map from "./Map";
+import OrderTable from "./OrderTable";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -33,7 +31,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function Main() {
   const classes = useStyles();
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
     <Container maxWidth="xl" className={classes.container}>
       <Grid container spacing={3}>

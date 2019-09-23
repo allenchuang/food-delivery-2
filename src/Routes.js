@@ -1,10 +1,4 @@
-import {
-  Home,
-  Dashboard,
-  DriveEta,
-  ShoppingCart,
-  History
-} from "@material-ui/icons";
+import { Dashboard, DriveEta, History } from "@material-ui/icons";
 import Main from "./dashboard/Main";
 import MapContainer from "./dashboard/MapContainer";
 import OrderHistory from "./dashboard/OrderHistory";

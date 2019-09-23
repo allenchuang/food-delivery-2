@@ -1,16 +1,15 @@
 import React from "react";
+import { connect } from "react-redux";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
   Label,
+  Line,
+  LineChart,
   ResponsiveContainer,
-  Tooltip
+  Tooltip,
+  XAxis,
+  YAxis
 } from "recharts";
 import Title from "./Title";
-
-import { connect } from "react-redux";
 
 // Generate Graph Data
 function createData(data, sec) {
@@ -36,16 +35,15 @@ const Chart = ({ data, sec }) => {
   return (
     <React.Fragment>
       <Title>Today</Title>
-      {/* <p>{sec}</p> */}
       <ResponsiveContainer>
         <LineChart
           data={results}
           margin={{ top: 16, right: 16, bottom: 0, left: 24 }}
         >
-          <XAxis dataKey="sec" />
-          <Label angle={270} position="left" style={{ textAnchor: "middle" }}>
-            Seconds
-          </Label>
+          <XAxis dataKey="sec">
+            {/* <Label position="insideBottom">Seconds</Label> */}
+          </XAxis>
+
           <YAxis allowDecimals={false}>
             <Label angle={270} position="left" style={{ textAnchor: "middle" }}>
               Total Orders
