@@ -18,11 +18,11 @@ This starts both the server [http://localhost:4001](http://localhost:4001) and c
 
 #### Communicating with server-side socket
 
-To initiate the socket connection, please click on the "Play" button on the upper-right of the app.
+- To initiate the socket connection, please click on the "Play" button on the upper-right of the app.
 
-To stop the connection, you can click on the "Stop" button.
+- To stop the connection, you can click on the "Stop" button.
 
-To reset the Redux store, you can click on the "Trash" icon.
+- To reset the Redux store, you can click on the "Trash" icon.
 
 #### Dashboard Views
 
