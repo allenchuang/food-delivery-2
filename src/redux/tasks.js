@@ -90,9 +90,16 @@ export const startStopChannel = function*() {
 export const listenSubscription = function*(socketChannel) {
   while (true) {
     const { order, sec } = yield take(socketChannel);
+    let newOrder = Object.assign({}, order);
+    // Condition to fetch for Destination Geocode / Routes
+    // TODO: Will have to include scenario for updating address,
+    // i.e. only fetch when new order is created or order address has been updated
+    if (order && order.id && order.event_name === CONSTANTS.CREATED) {
+      newOrder = yield call(fetchGeoData, order);
+    }
     yield put({
       type: ACTIONS.SUBSCRIBE_TIMER,
-      order: order,
+      order: newOrder,
       sec
     });
   }
@@ -112,7 +119,10 @@ export const listenServerSaga = function*() {
     }
     const socketChannel = yield call(createSocketChannel, socket);
 
-    yield fork(listenSubscription, socketChannel);
+    for (let i = 0; i < CONSTANTS.MAX_SOCKETS_CONCURRENTLY; i++) {
+      yield fork(listenSubscription, socketChannel);
+    }
+
     // writing data back to server
     yield fork(listenWriteSaga, socket);
 
@@ -164,21 +174,8 @@ export const fetchGeoData = async order => {
 export const createSocketChannel = socket =>
   eventChannel(emit => {
     const newOrderHandler = async (order, sec) => {
-      let newOrder = Object.assign({}, order);
-      // Condition to fetch for Destination Geocode / Routes
-      // TODO: Will have to include scenario for updating address,
-      // i.e. only fetch when new order is created or order address has been updated
-      if (order.event_name === CONSTANTS.CREATED) {
-        try {
-          newOrder = await fetchGeoData(order);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      // if no fetch required, emit back the same order object.
       emit({
-        order: newOrder,
+        order,
         sec
       });
     };
