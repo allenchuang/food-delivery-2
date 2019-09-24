@@ -18,7 +18,8 @@ const server = http.createServer(app);
 
 // socket
 const io = socketIO(server, {
-  pingInterval: 1000 // interval of 1 second for consistent counting
+  pingInterval: 1000, // interval of 1 second for consistent counting
+  pingTimeout: 20000 // increase pingTimeout to handle high frequency
 });
 
 // load in local data
@@ -80,6 +81,17 @@ io.on("connection", socket => {
   socket.on("disconnect", reason => {
     if (reason === "client namespace disconnect") {
       console.log("Client disconnected");
+    }
+    if (reason === "ping timeout") {
+      console.log(
+        "Ping timeout, client stopped responding in allowed pingTimeout"
+      );
+    }
+    if (reason === "server namespace disconnect") {
+      console.log("Server performed a socket.disconnect()");
+    }
+    if (reason === "transport error") {
+      console.log("transport error");
     }
     clearInterval(interval);
     sec = 0;
