@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { colorEventType } from "../utils";
 import clsx from "clsx";
@@ -64,5 +65,20 @@ class OrderInfo extends PureComponent {
     );
   }
 }
+
+OrderInfo.propTypes = {
+  order: PropTypes.shape({
+    uid: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    event_name: PropTypes.string.isRequired,
+    destination: PropTypes.string.isRequired,
+    sent_at_second: PropTypes.number.isRequired,
+    directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+    longitude: PropTypes.number,
+    latitude: PropTypes.number
+  }).isRequired,
+  classes: PropTypes.shape({}).isRequired
+};
 
 export default withStyles(styles)(OrderInfo);

@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-
+import PropTypes from "prop-types";
 import Modal from "@material-ui/core/Modal";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -109,6 +109,25 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   handleUpdateOrder: order => dispatch(updateOrder(order))
 });
+
+OrderPopup.propTypes = {
+  sec: PropTypes.number.isRequired,
+  handleUpdateOrder: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  setModalState: PropTypes.func.isRequired,
+  editOrder: PropTypes.shape({
+    uid: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    event_name: PropTypes.string.isRequired,
+    destination: PropTypes.string.isRequired,
+    sent_at_second: PropTypes.number.isRequired,
+    directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+    longitude: PropTypes.number,
+    latitude: PropTypes.number
+  }).isRequired,
+  setEditOrder: PropTypes.func.isRequired
+};
 
 export default connect(
   mapStateToProps,

@@ -1,6 +1,7 @@
 /* eslint-disable no-script-url */
 
 import React from "react";
+import PropTypes from "prop-types";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -239,6 +240,28 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   handleFilterBySec: orderType => e =>
     dispatch(filterSecByOrderType(orderType)(e))
 });
+
+OrderTable.propTypes = {
+  title: PropTypes.string,
+  orderType: PropTypes.string.isRequired,
+  tableData: PropTypes.arrayOf(
+    PropTypes.shape({
+      uid: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      event_name: PropTypes.string.isRequired,
+      destination: PropTypes.string.isRequired,
+      sent_at_second: PropTypes.number.isRequired,
+      directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+      longitude: PropTypes.number,
+      latitude: PropTypes.number
+    }).isRequired
+  ).isRequired,
+  filteredType: PropTypes.string.isRequired,
+  filteredSec: PropTypes.number.isRequired,
+  handleFilterByType: PropTypes.func.isRequired,
+  handleFilterBySec: PropTypes.func.isRequired
+};
 
 export default connect(
   mapStateToProps,

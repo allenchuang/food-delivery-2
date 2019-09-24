@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import MapGL, { Marker, Popup, SVGOverlay, CanvasOverlay } from "react-map-gl";
 
@@ -206,6 +207,38 @@ const mapStateToProps = state => ({
   orderMap: state.orderMap,
   data: state.data
 });
+
+Map.propTypes = {
+  width: PropTypes.string,
+  height: PropTypes.string,
+  mapstyle: PropTypes.string,
+  orderMap: PropTypes.shape(
+    PropTypes.shape({
+      uid: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      event_name: PropTypes.string.isRequired,
+      destination: PropTypes.string.isRequired,
+      sent_at_second: PropTypes.number.isRequired,
+      directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+      longitude: PropTypes.number,
+      latitude: PropTypes.number
+    })
+  ).isRequired,
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      uid: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      event_name: PropTypes.string.isRequired,
+      destination: PropTypes.string.isRequired,
+      sent_at_second: PropTypes.number.isRequired,
+      directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+      longitude: PropTypes.number,
+      latitude: PropTypes.number
+    }).isRequired
+  ).isRequired
+};
 
 export default connect(
   mapStateToProps,

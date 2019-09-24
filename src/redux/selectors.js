@@ -5,7 +5,13 @@ import * as CONSTANTS from "../constants";
 const getSec = state => state.sec;
 
 // ORDER TYPE SELECTORS
-const getAllOrders = state => state.data;
+const getAllOrders = state =>
+  state.data.sort((a, b) => {
+    if (a.sent_at_second === b.sent_at_second) {
+      return b.name.toLowerCase() - a.name.toLowerCase();
+    }
+    return b.sent_at_second - a.sent_at_second;
+  });
 const getActiveOrders = state =>
   Object.values(state.orderMap)
     .filter(order => CONSTANTS.ACTIVE_ORDERS_EVENTS.includes(order.event_name))

@@ -35,17 +35,6 @@ export default function Main() {
     <Container maxWidth="xl" className={classes.container}>
       <Grid container spacing={3}>
         <Grid container item xs={12} md={6} spacing={1}>
-          {/* Server Status */}
-          {/* <Grid item xs={12}>
-            <Paper className={fixedHeightPaper}>
-              <ServerStatus
-              // channelOnline={channelOnline}
-              // sec={sec}
-              // serverOnline={serverOnline}
-              />
-            </Paper>
-          </Grid> */}
-          {/* Recent Orders */}
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <OrderTable
@@ -66,11 +55,9 @@ export default function Main() {
           </Hidden>
         </Grid>
         <Grid container item xs={12} md={6} spacing={1}>
-          {/* Map */}
           <Grid item xs={12}>
             <Map height={"80vh"} />
           </Grid>
-          {/* Server Status */}
         </Grid>
       </Grid>
     </Container>

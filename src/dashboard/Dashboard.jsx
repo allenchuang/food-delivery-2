@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
@@ -22,6 +23,7 @@ import * as ACTIONS from "../redux/actions";
 import { withStyles } from "@material-ui/core/styles";
 import logo from "../images/logo-cloudkitchens.png";
 import Router from "../Router";
+import ServerStatus from "./ServerStatus";
 
 function Copyright() {
   return (
@@ -236,7 +238,7 @@ export class Dashboard extends React.Component {
 
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-
+          <ServerStatus />
           <Router />
           <Copyright />
         </main>
@@ -249,6 +251,13 @@ const mapDispatchToProps = {
   startChannel: ACTIONS.startChannel,
   stopChannel: ACTIONS.stopChannel,
   resetStore: ACTIONS.resetStore
+};
+
+Dashboard.propTypes = {
+  startChannel: PropTypes.func.isRequired,
+  stopChannel: PropTypes.func.isRequired,
+  resetStore: PropTypes.func.isRequired,
+  classes: PropTypes.shape({})
 };
 
 export default compose(

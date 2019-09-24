@@ -1,39 +1,58 @@
 /* eslint-disable no-script-url */
 import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Title from "./Title";
 
 const useStyles = makeStyles({
-  depositContext: {
-    flex: 1
-  },
   connected: {
-    color: "green"
+    color: "green",
+    display: "inline-block"
   },
   disconnected: {
-    color: "red"
+    color: "red",
+    display: "inline-block"
   }
 });
 
-export default function ServerStatus({ ...props }) {
+const ServerStatus = ({ channelOnline, serverOnline, sec }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      <Title>Server Status</Title>
+      {/* <Title>Server Status</Title>
       <Typography component="p" variant="h4">
-        {props.sec} secs
-      </Typography>
-      {props.channelOnline ? (
-        <p className={classes.connected}>Socket Channel Connected</p>
+        {sec} secs
+      </Typography> */}
+      {channelOnline ? (
+        <div className={classes.connected}>Socket Channel Connected</div>
       ) : (
-        <p className={classes.disconnected}>Channel Disconnected</p>
-      )}
-      {props.serverOnline ? (
-        <p className={classes.connected}>Server Online</p>
+        <div className={classes.disconnected}>Channel Disconnected</div>
+      )}{" "}
+      /
+      {serverOnline ? (
+        <div className={classes.connected}>Server Online</div>
       ) : (
-        <p className={classes.disconnected}>Server Offline</p>
+        <div className={classes.disconnected}>Server Offline</div>
       )}
     </React.Fragment>
   );
-}
+};
+
+const mapStateToProps = state => ({
+  channelOnline: state.channelOnline,
+  serverOnline: state.serverOnline,
+  sec: state.sec
+});
+
+ServerStatus.propTypes = {
+  channelOnline: PropTypes.bool.isRequired,
+  serverOnline: PropTypes.bool.isRequired,
+  sec: PropTypes.number.isRequired
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(ServerStatus);
