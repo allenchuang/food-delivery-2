@@ -2,6 +2,8 @@
 
 This project is handmade by Allen Chuang, using Node.JS, Express, Socket.io, React, Redux, Redux-Saga, Material-UI, MapBox API, React Map GL. Using Enzyme and Jest for testing.
 
+🍔🌮🍣🥟🥡🍱🍛
+
 ## Instructions
 
 To quickly get the project up and spinning simply run:
