@@ -2,7 +2,6 @@ import { combineReducers } from "redux";
 import initialState from "./initialState";
 import { filterAll, filterActive, filterInactive } from "./filtersReducer";
 import * as ACTIONS from "./actions";
-import * as CONSTANTS from "../constants";
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
@@ -17,7 +16,8 @@ const handleSubscription = (state, action) => {
       ? {
           ...orderMap[order.id],
           event_name: order.event_name,
-          sent_at_second: order.sent_at_second
+          sent_at_second: order.sent_at_second,
+          uid: order.uid
         }
       : order;
     // }
@@ -42,19 +42,20 @@ const handleUpdateOrder = (state, action) => {
     orderMap = { ...state.orderMap };
   if (Object.keys(order).length !== 0) {
     data.unshift(order);
-    if (order.event_name === CONSTANTS.CANCELLED) {
-      delete orderMap[order.id];
-    } else {
-      orderMap[order.id] = orderMap[order.id]
-        ? {
-            ...orderMap[order.id],
-            event_name: order.event_name,
-            destination: order.destination,
-            name: order.name,
-            sent_at_second: order.sent_at_second
-          }
-        : order;
-    }
+    // if (order.event_name === CONSTANTS.CANCELLED) {
+    //   delete orderMap[order.id];
+    // } else {
+    orderMap[order.id] = orderMap[order.id]
+      ? {
+          ...orderMap[order.id],
+          sent_at_second: order.sent_at_second,
+          event_name: order.event_name
+          // TODO: add ability to update other attributes
+          // destination: order.destination,
+          // name: order.name
+        }
+      : order;
+    // }
   }
   return {
     ...state,

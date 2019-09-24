@@ -88,7 +88,7 @@ const useStyles = makeStyles(theme => ({
 const OrderTable = ({
   title,
   orderType,
-  activeOrders,
+  tableData,
   filteredType,
   filteredSec,
   handleFilterByType,
@@ -107,7 +107,7 @@ const OrderTable = ({
   const onFilterSec = e =>
     handleFilterBySec(orderType)(parseInt(e.target.value));
 
-  const results = activeOrders.map(order => (
+  const results = tableData.map(order => (
     <TableRow hover key={order.uid}>
       {/* <TableCell>{order.id}</TableCell> */}
       <TableCell>
@@ -136,6 +136,7 @@ const OrderTable = ({
       </TableCell>
       <TableCell align="right">
         <button
+          id="edit-button"
           className={classes.editBtn}
           onClick={() => {
             setEditOrder(order);
@@ -227,7 +228,7 @@ const OrderTable = ({
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  activeOrders: getOrdersWithFilters(state, CONSTANTS[ownProps.orderType]),
+  tableData: getOrdersWithFilters(state, CONSTANTS[ownProps.orderType]),
   filteredType: state[mapOrderTypesToKey[ownProps.orderType]].event,
   filteredSec: state[mapOrderTypesToKey[ownProps.orderType]].sec
 });

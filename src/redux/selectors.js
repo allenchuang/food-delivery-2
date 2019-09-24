@@ -9,13 +9,23 @@ const getAllOrders = state => state.data;
 const getActiveOrders = state =>
   Object.values(state.orderMap)
     .filter(order => CONSTANTS.ACTIVE_ORDERS_EVENTS.includes(order.event_name))
-    .sort((a, b) => b.sent_at_second - a.sent_at_second);
+    .sort((a, b) => {
+      if (a.sent_at_second === b.sent_at_second) {
+        return b.name.toLowerCase() - a.name.toLowerCase();
+      }
+      return b.sent_at_second - a.sent_at_second;
+    });
 const getInactiveOrders = state =>
   Object.values(state.orderMap)
     .filter(order =>
       CONSTANTS.INACTIVE_ORDERS_EVENTS.includes(order.event_name)
     )
-    .sort((a, b) => b.sent_at_second - a.sent_at_second);
+    .sort((a, b) => {
+      if (a.sent_at_second === b.sent_at_second) {
+        return b.name.toLowerCase() - a.name.toLowerCase();
+      }
+      return b.sent_at_second - a.sent_at_second;
+    });
 
 const getDataByOrderType = (state, orderType) => {
   switch (orderType) {

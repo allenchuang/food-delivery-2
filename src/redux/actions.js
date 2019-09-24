@@ -39,6 +39,7 @@ export const resetStore = () => ({
   type: RESET_STORE
 });
 
+// --- FILTERS
 export const filterEventByOrderType = orderType => event => ({
   type: `FILTER_${orderType}_EVENT`,
   event
@@ -50,14 +51,7 @@ export const filterSecByOrderType = orderType => sec => ({
 });
 
 // --- UPDATE ORDER
-export function updateOrder(order) {
-  return {
-    type: UPDATE_ORDER,
-    order
-  };
-}
-
-export const getOrdersGeocode = order => ({
-  type: GET_ORDERS_GEOCODE,
+export const updateOrder = order => ({
+  type: UPDATE_ORDER,
   order
 });

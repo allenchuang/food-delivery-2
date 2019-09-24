@@ -6,14 +6,19 @@ export default {
   serverOnline: undefined,
   filterAll: {
     event: null,
-    sec: undefined
+    sec: null
   },
   filterActive: {
     event: null,
-    sec: undefined
+    sec: null
   },
   filterInactive: {
     event: null,
-    sec: undefined
+    sec: null
   }
+};
+
+export const defaultFilterState = {
+  event: null,
+  sec: null
 };

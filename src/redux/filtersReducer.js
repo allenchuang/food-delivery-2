@@ -1,11 +1,15 @@
 import { combineReducers } from "redux";
 import * as CONSTANTS from "../constants";
+import * as ACTIONS from "./actions";
 
 export const filterEventByOrderType = orderType => {
   return (event = null, action) => {
     switch (action.type) {
       case `FILTER_${orderType}_EVENT`:
         return action.event;
+      case ACTIONS.RESET_STORE: {
+        return null;
+      }
       default:
         return event;
     }
@@ -17,6 +21,9 @@ export const filterSecByOrderType = orderType => {
     switch (action.type) {
       case `FILTER_${orderType}_SEC`:
         return action.sec;
+      case ACTIONS.RESET_STORE: {
+        return null;
+      }
       default:
         return sec;
     }
