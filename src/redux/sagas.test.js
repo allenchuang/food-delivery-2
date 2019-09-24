@@ -1,19 +1,25 @@
 import SocketMock from "socket.io-mock";
 import { eventChannel } from "redux-saga";
-// import { call, put, take, fork, delay, cancelled } from "redux-saga/effects";
+import { call, put, take, fork, delay, cancelled } from "redux-saga/effects";
 import { expectSaga } from "redux-saga-test-plan";
-// import * as matchers from "redux-saga-test-plan/matchers";
+import * as matchers from "redux-saga-test-plan/matchers";
 // import { throwError } from "redux-saga-test-plan/providers";
-import { listenSubscription } from "./tasks";
+import { listenSubscription, fetchGeoData } from "./tasks";
 import * as ACTIONS from "./actions";
 import * as CONSTANTS from "../constants";
 
-const fakeFetchCall = jest.fn(order => ({
-  ...order,
-  latitude: -123,
-  longitude: 90,
-  directions: [[-123, 90], [-124, 91]]
-}));
+const fakeFetchCall = jest.fn(order => {
+  if (order && order.event_name === CONSTANTS.CREATED) {
+    return {
+      ...order,
+      latitude: -123,
+      longitude: 90,
+      directions: [[-123, 90], [-124, 91]]
+    };
+  } else {
+    return order;
+  }
+});
 
 describe("listenSubscription Saga tests", () => {
   let emitter;
@@ -41,19 +47,11 @@ describe("listenSubscription Saga tests", () => {
 
     provideEvent = event => {
       let consumed = false;
-      let newEvent = { ...event };
       return {
         take({ channel }, next) {
           if (channel === socketChannel && !consumed) {
             consumed = true;
-            if (newEvent) {
-              // console.log("order########", newEvent.order.event_name);
-              if (newEvent.order.event_name === CONSTANTS.CREATED) {
-                newEvent.order = fakeFetchCall(newEvent.order);
-              }
-              // console.log("new order@@@@@@@@@@@", newEvent);
-            }
-            return newEvent;
+            return event;
           }
 
           return next();
@@ -75,7 +73,13 @@ describe("listenSubscription Saga tests", () => {
     };
 
     return expectSaga(listenSubscription, socketChannel)
-      .provide([provideEvent(fakeEvent)])
+      .provide([
+        provideEvent(fakeEvent), // returns { order, sec }
+        [
+          matchers.call.fn(fetchGeoData, fakeEvent.order),
+          fakeFetchCall(fakeEvent.order)
+        ]
+      ])
       .put({
         type: ACTIONS.SUBSCRIBE_TIMER,
         order: {
@@ -103,7 +107,13 @@ describe("listenSubscription Saga tests", () => {
     };
 
     return expectSaga(listenSubscription, socketChannel)
-      .provide([provideEvent(fakeEvent)])
+      .provide([
+        provideEvent(fakeEvent), // returns { order, sec }
+        [
+          matchers.call.fn(fetchGeoData, fakeEvent.order),
+          fakeFetchCall(fakeEvent.order)
+        ]
+      ])
       .put({
         type: ACTIONS.SUBSCRIBE_TIMER,
         order: {
