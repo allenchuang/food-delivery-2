@@ -23,20 +23,17 @@ import * as ACTIONS from "../redux/actions";
 import { withStyles } from "@material-ui/core/styles";
 import logo from "../images/logo-cloudkitchens.png";
 import Router from "../Router";
-import ServerStatus from "./ServerStatus";
+// import ServerStatus from "./ServerStatus";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        CloudKitchen Challenge Demo
       </Link>{" "}
       {new Date().getFullYear()}
-      {". Built with "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Material-UI.
-      </Link>
+      {". Built by Allen Chuang "}
     </Typography>
   );
 }
@@ -238,9 +235,11 @@ export class Dashboard extends React.Component {
 
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <ServerStatus />
+
           <Router />
           <Copyright />
+          {/* For debugging purpose */}
+          {/* <ServerStatus align="center" /> */}
         </main>
       </div>
     );

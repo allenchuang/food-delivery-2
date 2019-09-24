@@ -125,7 +125,7 @@ OrderPopup.propTypes = {
     directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
     longitude: PropTypes.number,
     latitude: PropTypes.number
-  }).isRequired,
+  }),
   setEditOrder: PropTypes.func.isRequired
 };
 

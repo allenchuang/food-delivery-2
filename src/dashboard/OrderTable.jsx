@@ -2,7 +2,6 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -218,12 +217,6 @@ const OrderTable = ({
           <TableBody>{results}</TableBody>
         </Table>
       </div>
-      <div className={classes.seeMore}>
-        <Link color="primary" href="#">
-          {" "}
-          See more orders
-        </Link>
-      </div>
     </React.Fragment>
   );
 };
@@ -257,8 +250,8 @@ OrderTable.propTypes = {
       latitude: PropTypes.number
     }).isRequired
   ).isRequired,
-  filteredType: PropTypes.string.isRequired,
-  filteredSec: PropTypes.number.isRequired,
+  filteredType: PropTypes.string,
+  filteredSec: PropTypes.number,
   handleFilterByType: PropTypes.func.isRequired,
   handleFilterBySec: PropTypes.func.isRequired
 };
