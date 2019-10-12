@@ -4,9 +4,12 @@ import * as ACTIONS from "./actions";
 
 const handleSubscription = (state, action) => {
   const { order, sec } = action;
-  let newData = [...state.data],
-    orderMap = { ...state.orderMap };
+
+  // if empty response just return unchanged state to prevent
+  // rerendering caused by cloning new state
   if (Object.keys(order).length !== 0) {
+    let newData = [...state.data],
+      orderMap = { ...state.orderMap };
     newData.unshift(order);
     orderMap[order.id] = orderMap[order.id]
       ? {
@@ -16,22 +19,26 @@ const handleSubscription = (state, action) => {
           uid: order.uid
         }
       : order;
-  }
 
-  return {
-    ...state,
-    serverOnline: true,
-    sec, // time elapsed,
-    data: newData,
-    orderMap
-  };
+    return {
+      ...state,
+      serverOnline: true,
+      sec, // time elapsed,
+      data: newData,
+      orderMap
+    };
+  }
+  return state;
 };
 
 const handleUpdateOrder = (state, action) => {
   const { order } = action;
-  let newData = [...state.data],
-    orderMap = { ...state.orderMap };
+
+  // if empty response just return unchanged state to prevent
+  // rerendering caused by cloning new state
   if (Object.keys(order).length !== 0) {
+    let newData = [...state.data],
+      orderMap = { ...state.orderMap };
     newData.unshift(order);
     orderMap[order.id] = orderMap[order.id]
       ? {
@@ -43,12 +50,13 @@ const handleUpdateOrder = (state, action) => {
           // name: order.name
         }
       : order;
+    return {
+      ...state,
+      data: newData,
+      orderMap
+    };
   }
-  return {
-    ...state,
-    data: newData,
-    orderMap
-  };
+  return state;
 };
 
 const mainReducer = (state = initialState, action) => {

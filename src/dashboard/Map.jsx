@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import MapGL, { Marker, Popup, SVGOverlay, CanvasOverlay } from "react-map-gl";
@@ -16,7 +16,7 @@ function round(x, n) {
   const tenN = Math.pow(10, n);
   return Math.round(x * tenN) / tenN;
 }
-class Map extends Component {
+class Map extends PureComponent {
   static defaultProps = {
     width: "100%",
     height: "480px",
@@ -175,7 +175,6 @@ class Map extends Component {
           ref={reactMap => (this.reactMap = reactMap)}
           onViewportChange={this._updateViewport}
           mapboxApiAccessToken={CONSTANTS.MAPBOX_TOKEN}
-          onStyleLoad={this._onStyleLoad}
           {...MapGLProps}
         >
           <style>{MARKER_STYLE}</style>
@@ -205,7 +204,6 @@ class Map extends Component {
 
 const mapStateToProps = state => ({
   orderMap: state.orderMap,
-  data: state.data
 });
 
 Map.propTypes = {
@@ -213,19 +211,6 @@ Map.propTypes = {
   height: PropTypes.string,
   mapstyle: PropTypes.string,
   orderMap: PropTypes.shape({}),
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      uid: PropTypes.string.isRequired,
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      event_name: PropTypes.string.isRequired,
-      destination: PropTypes.string.isRequired,
-      sent_at_second: PropTypes.number.isRequired,
-      directions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
-      longitude: PropTypes.number,
-      latitude: PropTypes.number
-    }).isRequired
-  ).isRequired
 };
 
 export default connect(
