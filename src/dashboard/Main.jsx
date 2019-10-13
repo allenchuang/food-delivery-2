@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Main() {
+const Main = React.memo(() => {
   const classes = useStyles();
   return (
     <Container maxWidth="xl" className={classes.container}>
@@ -62,4 +62,6 @@ export default function Main() {
       </Grid>
     </Container>
   );
-}
+});
+
+export default Main;

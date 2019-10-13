@@ -42,4 +42,4 @@ NavList.propTypes = {
   location: PropTypes.shape({}).isRequired
 };
 
-export default withRouter(NavList);
+export default withRouter(React.memo(NavList));

@@ -50,7 +50,9 @@ ServerStatus.propTypes = {
   sec: PropTypes.number.isRequired
 };
 
-export default connect(
-  mapStateToProps,
-  null
-)(ServerStatus);
+export default React.memo(
+  connect(
+    mapStateToProps,
+    null
+  )(ServerStatus)
+);

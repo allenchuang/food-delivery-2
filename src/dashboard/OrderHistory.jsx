@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function OrderHistory() {
+const OrderHistory = React.memo(() => {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
@@ -45,4 +45,6 @@ export default function OrderHistory() {
       </Grid>
     </Container>
   );
-}
+});
+
+export default OrderHistory;

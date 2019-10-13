@@ -129,7 +129,9 @@ OrderPopup.propTypes = {
   setEditOrder: PropTypes.func.isRequired
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(OrderPopup);
+export default React.memo(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(OrderPopup)
+);

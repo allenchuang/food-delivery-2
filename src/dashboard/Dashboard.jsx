@@ -119,7 +119,7 @@ const styles = theme => ({
   }
 });
 
-export class Dashboard extends React.Component {
+export class Dashboard extends React.PureComponent {
   state = {
     open: false
   };
