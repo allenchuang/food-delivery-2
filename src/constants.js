@@ -30,3 +30,4 @@ export const MAPBOX_KITCHEN_ADDRESS = `1800 Marine Street, Santa Monica, CA 9040
 
 // SOCKETS
 export const MAX_SOCKETS_CONCURRENTLY = 100;
+export const THROTTLE_DELAY = 500

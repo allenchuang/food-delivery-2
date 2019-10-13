@@ -170,7 +170,7 @@ export const listenSubscription = function*(socketChannel) {
     const currentEvent = yield take(socketChannel);
 
     // wait for all events within 1 sec interval
-    yield delay(1000);
+    yield delay(CONSTANTS.THROTTLE_DELAY);
 
     // store (flush) all the events within the 1 sec interval to variable
     const bufferedEvents = yield flush(socketChannel);
