@@ -22,8 +22,6 @@ const socketServerURL = "http://localhost:4001"; // API proxy (http://localhost:
 // wrapping functions for socket events (connect, disconnect, reconnect)
 let socket;
 const geoCache = {};
-const ids = {};
-const tasks = {};
 
 export const connect = () => {
   socket = io(socketServerURL);
@@ -93,27 +91,6 @@ export const startStopChannel = function*() {
     });
   }
 };
-
-// export const fetchGeoData = async order => {
-//   let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
-//   const geoCodeResponse = await fetch(geoCodeUrl);
-//   const json = await geoCodeResponse.json();
-//   let longitude = json.features[0].geometry.coordinates[0];
-//   let latitude = json.features[0].geometry.coordinates[1];
-//   let directionsUrl = `${
-//     CONSTANTS.MAPBOX_DIRECTIONS_URL
-//   }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
-//     ","
-//   )};${longitude},${latitude}?geometries=geojson&access_token=${
-//     CONSTANTS.MAPBOX_TOKEN
-//   }`;
-//   const directionsResponse = await fetch(directionsUrl);
-//   const directionsJson = await directionsResponse.json();
-
-//   let directions = directionsJson.routes[0].geometry.coordinates;
-
-//   return { ...order, latitude, longitude, directions };
-// };
 
 async function fetchJson(url) {
   let resp;
@@ -199,26 +176,8 @@ export const listenSubscription = function*(socketChannel) {
     const bufferedEvents = yield flush(socketChannel);
     const allEvents = [currentEvent].concat(bufferedEvents);
 
-    // allEvents.forEach(function*(order) {
-    //   if (!geoCache[order.id]) {
-    //     geoCache[order.id] = {};
-    //   }
-    //   geoCache[order.id][order.destination] = true;
-    //   if (tasks[order.destination]) {
-    //     yield cancel(tasks[order.destination]);
-    //   }
-    //   tasks[order.destination] = yield fork(fetchGeoData, order);
-    // });
     const eventsWithGeoData = yield all(
-      allEvents.map(
-        order => {
-          // geoCache[order.id] = geoCache[order.id] ? geoCache[order.id] : {};
-          // if (!geoCache[order.id][order.destination]) {
-          return call(fetchGeoData, order);
-          // geoCache[order.id][order.destination] = orderWithGeoData;
-        }
-        // return { ...geoCache[order.id][order.destination], ...order };
-      )
+      allEvents.map(order => call(fetchGeoData, order))
     );
 
     yield fork(function*(allEvents) {
