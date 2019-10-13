@@ -111,7 +111,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 OrderPopup.propTypes = {
-  sec: PropTypes.number.isRequired,
+  sec: PropTypes.number,
   handleUpdateOrder: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   setModalState: PropTypes.func.isRequired,
