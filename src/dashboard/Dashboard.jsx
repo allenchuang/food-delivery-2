@@ -23,7 +23,7 @@ import * as ACTIONS from "../redux/actions";
 import { withStyles } from "@material-ui/core/styles";
 import logo from "../images/logo-cloudkitchens.png";
 import Router from "../Router";
-// import ServerStatus from "./ServerStatus";
+import ServerStatus from "./ServerStatus";
 
 function Copyright() {
   return (
@@ -239,7 +239,7 @@ export class Dashboard extends React.PureComponent {
           <Router />
           <Copyright />
           {/* For debugging purpose */}
-          {/* <ServerStatus align="center" /> */}
+          <ServerStatus align="center" />
         </main>
       </div>
     );

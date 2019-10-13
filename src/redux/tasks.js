@@ -1,15 +1,18 @@
 import io from "socket.io-client";
 import {
+  all,
   take,
   put,
   call,
   fork,
+  flush,
   delay,
   race,
   cancel,
   cancelled
 } from "redux-saga/effects";
-import { eventChannel } from "redux-saga";
+
+import { eventChannel, buffers } from "redux-saga";
 import * as ACTIONS from "./actions";
 import * as CONSTANTS from "../constants";
 
@@ -18,6 +21,10 @@ const socketServerURL = "http://localhost:4001"; // API proxy (http://localhost:
 
 // wrapping functions for socket events (connect, disconnect, reconnect)
 let socket;
+const geoCache = {};
+const ids = {};
+const tasks = {};
+
 export const connect = () => {
   socket = io(socketServerURL);
   return new Promise(resolve => {
@@ -87,19 +94,150 @@ export const startStopChannel = function*() {
   }
 };
 
+// export const fetchGeoData = async order => {
+//   let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
+//   const geoCodeResponse = await fetch(geoCodeUrl);
+//   const json = await geoCodeResponse.json();
+//   let longitude = json.features[0].geometry.coordinates[0];
+//   let latitude = json.features[0].geometry.coordinates[1];
+//   let directionsUrl = `${
+//     CONSTANTS.MAPBOX_DIRECTIONS_URL
+//   }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
+//     ","
+//   )};${longitude},${latitude}?geometries=geojson&access_token=${
+//     CONSTANTS.MAPBOX_TOKEN
+//   }`;
+//   const directionsResponse = await fetch(directionsUrl);
+//   const directionsJson = await directionsResponse.json();
+
+//   let directions = directionsJson.routes[0].geometry.coordinates;
+
+//   return { ...order, latitude, longitude, directions };
+// };
+
+async function fetchJson(url) {
+  let resp;
+  try {
+    let data = await fetch(url);
+    resp = await data.json();
+  } catch (e) {
+    resp = { err: e.message };
+  }
+  return resp;
+}
+
+export const fetchGeoData = function*(order) {
+  geoCache[order.id] = geoCache[order.id] ? geoCache[order.id] : {};
+  if (geoCache[order.id][order.destination]) {
+    return geoCache[order.id][order.destination][order.directions]
+      ? geoCache[order.id][order.destination]
+      : order;
+  } else {
+    try {
+      geoCache[order.id][order.destination] = {};
+      yield put({ type: ACTIONS.FETCH_GEODATA_START });
+      let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
+
+      // call geoCode API
+      const geoCodeData = yield call(fetchJson, geoCodeUrl);
+      if (!geoCodeData.err) {
+        yield put({ type: ACTIONS.FETCH_GEOCODE_SUCCESS });
+        const [
+          longitude,
+          latitude
+        ] = geoCodeData.features[0].geometry.coordinates;
+        let directionsUrl = `${
+          CONSTANTS.MAPBOX_DIRECTIONS_URL
+        }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
+          ","
+        )};${longitude},${latitude}?geometries=geojson&access_token=${
+          CONSTANTS.MAPBOX_TOKEN
+        }`;
+
+        // call directions API
+        const directionsData = yield call(fetchJson, directionsUrl);
+        if (!directionsData.err) {
+          yield put({ type: ACTIONS.FETCH_DIRECTIONS_SUCCESS });
+          yield put({ type: ACTIONS.FETCH_GEODATA_SUCCESS });
+          const directions = directionsData.routes[0].geometry.coordinates;
+
+          // save to cache
+          geoCache[order.id][order.destination] = {
+            latitude,
+            longitude,
+            directions,
+            ...order
+          };
+          // Return latitude / longitude and directions obj
+          return geoCache[order.id][order.destination];
+        } else {
+          yield put({
+            type: ACTIONS.FETCH_DIRECTIONS_FAILED,
+            ...directionsData.err.message
+          });
+        }
+      } else {
+        yield put({
+          type: ACTIONS.FETCH_GEOCODE_FAILED,
+          ...geoCodeData.err.message
+        });
+      }
+    } catch (e) {
+      yield put({ type: ACTIONS.FETCH_GEODATA_FAILED, message: e.message });
+    }
+  }
+};
+
 export const listenSubscription = function*(socketChannel) {
   while (true) {
-    const { order, sec } = yield take(socketChannel);
-    let newOrder = Object.assign({}, order);
-    // Condition to fetch for Destination Geocode / Routes
-    // TODO: Will have to include scenario for updating address,
-    // i.e. only fetch when new order is created or order address has been updated
-    if (order && order.id && order.event_name === CONSTANTS.CREATED) {
-      newOrder = yield call(fetchGeoData, order);
-    }
+    const currentEvent = yield take(socketChannel);
+
+    // wait for all events within 1 sec interval
+    yield delay(1000);
+
+    // store (flush) all the events within the 1 sec interval to variable
+    const bufferedEvents = yield flush(socketChannel);
+    const allEvents = [currentEvent].concat(bufferedEvents);
+
+    // allEvents.forEach(function*(order) {
+    //   if (!geoCache[order.id]) {
+    //     geoCache[order.id] = {};
+    //   }
+    //   geoCache[order.id][order.destination] = true;
+    //   if (tasks[order.destination]) {
+    //     yield cancel(tasks[order.destination]);
+    //   }
+    //   tasks[order.destination] = yield fork(fetchGeoData, order);
+    // });
+    const eventsWithGeoData = yield all(
+      allEvents.map(
+        order => {
+          // geoCache[order.id] = geoCache[order.id] ? geoCache[order.id] : {};
+          // if (!geoCache[order.id][order.destination]) {
+          return call(fetchGeoData, order);
+          // geoCache[order.id][order.destination] = orderWithGeoData;
+        }
+        // return { ...geoCache[order.id][order.destination], ...order };
+      )
+    );
+
+    yield fork(function*(allEvents) {
+      console.log("all events", allEvents);
+
+      yield put({
+        type: ACTIONS.SUBSCRIBE_ORDER,
+        orders: allEvents
+      });
+    }, eventsWithGeoData);
+  }
+};
+
+const listenTimer = function*(socketChannel) {
+  while (true) {
+    const sec = yield take(socketChannel);
+
     yield put({
       type: ACTIONS.SUBSCRIBE_TIMER,
-      order: newOrder,
       sec
     });
   }
@@ -117,11 +255,14 @@ export const listenServerSaga = function*() {
       yield put({ type: ACTIONS.SERVER_OFF });
       socket.disconnect(true);
     }
-    const socketChannel = yield call(createSocketChannel, socket);
+    const newOrderChannel = yield call(createNewOrderChannel, socket);
+    const timerChannel = yield call(createTimerChannel, socket);
 
-    for (let i = 0; i < CONSTANTS.MAX_SOCKETS_CONCURRENTLY; i++) {
-      yield fork(listenSubscription, socketChannel);
-    }
+    // Listens to timer
+    yield fork(listenTimer, timerChannel);
+
+    // Listens to new order events
+    yield fork(listenSubscription, newOrderChannel);
 
     // writing data back to server
     yield fork(listenWriteSaga, socket);
@@ -150,39 +291,23 @@ export const listenServerSaga = function*() {
   }
 };
 
-export const fetchGeoData = async order => {
-  let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
-  const geoCodeResponse = await fetch(geoCodeUrl);
-  const json = await geoCodeResponse.json();
-  let longitude = json.features[0].geometry.coordinates[0];
-  let latitude = json.features[0].geometry.coordinates[1];
-  let directionsUrl = `${
-    CONSTANTS.MAPBOX_DIRECTIONS_URL
-  }${CONSTANTS.MAPBOX_KITCHEN_COORDINATES.join(
-    ","
-  )};${longitude},${latitude}?geometries=geojson&access_token=${
-    CONSTANTS.MAPBOX_TOKEN
-  }`;
-  const directionsResponse = await fetch(directionsUrl);
-  const directionsJson = await directionsResponse.json();
-
-  let directions = directionsJson.routes[0].geometry.coordinates;
-
-  return { ...order, latitude, longitude, directions };
-};
 // This is how channel is created
-export const createSocketChannel = socket =>
+export const createNewOrderChannel = socket =>
   eventChannel(emit => {
-    const newOrderHandler = async (order, sec) => {
-      emit({
-        order,
-        sec
-      });
-    };
-
+    const newOrderHandler = order => emit(order);
     socket.on("newOrder", newOrderHandler);
 
     return () => {
       socket.off("newOrder", newOrderHandler);
+    };
+  }, buffers.expanding(20));
+
+export const createTimerChannel = socket =>
+  eventChannel(emit => {
+    const timerHandler = sec => emit(sec);
+    socket.on("timer", timerHandler);
+
+    return () => {
+      socket.off("timer", timerHandler);
     };
   });

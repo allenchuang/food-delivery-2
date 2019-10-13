@@ -38,20 +38,22 @@ io.on("connection", socket => {
     interval;
   if (typeof interval === "undefined") {
     interval = setInterval(function() {
-      sec++;
       console.log(sec);
+      // emit seconds in separate channel
+      io.sockets.emit("timer", sec);
+
+      // if data timestamp matches timer
+      // then emit newOrder in separate channel
       let events = data.filter(i => i.sent_at_second === sec);
       if (events.length > 0) {
         let event;
         for (event of events) {
           let newEvent = Object.assign({}, event, { uid: uuid() });
-          io.sockets.emit("newOrder", newEvent, sec);
+          io.sockets.emit("newOrder", newEvent);
           console.log(event);
         }
-      } else {
-        io.sockets.emit("newOrder", {}, sec);
-        console.log({});
       }
+      sec++;
     }, 1000);
   }
 

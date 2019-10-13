@@ -19,10 +19,8 @@ const ServerStatus = ({ channelOnline, serverOnline, sec }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {/* <Title>Server Status</Title>
-      <Typography component="p" variant="h4">
-        {sec} secs
-      </Typography> */}
+      {/* <Title>Server Status</Title> */}
+      <p>{sec} secs</p>
       {channelOnline ? (
         <div className={classes.connected}>Socket Channel Connected</div>
       ) : (
@@ -45,9 +43,9 @@ const mapStateToProps = state => ({
 });
 
 ServerStatus.propTypes = {
-  channelOnline: PropTypes.bool.isRequired,
-  serverOnline: PropTypes.bool.isRequired,
-  sec: PropTypes.number.isRequired
+  channelOnline: PropTypes.bool,
+  serverOnline: PropTypes.bool,
+  sec: PropTypes.number
 };
 
 export default React.memo(

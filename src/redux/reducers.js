@@ -2,33 +2,69 @@ import initialState from "./initialState";
 import { filterAll, filterActive, filterInactive } from "./filtersReducer";
 import * as ACTIONS from "./actions";
 
-const handleSubscription = (state, action) => {
-  const { order, sec } = action;
-
-  // if empty response just return unchanged state to prevent
-  // rerendering caused by cloning new state
-  if (Object.keys(order).length !== 0) {
-    let newData = [...state.data],
-      orderMap = { ...state.orderMap };
-    newData.unshift(order);
-    orderMap[order.id] = orderMap[order.id]
-      ? {
-          ...orderMap[order.id],
-          event_name: order.event_name,
-          sent_at_second: order.sent_at_second,
-          uid: order.uid
-        }
-      : order;
-
+const handleTimerSubscription = (state, action) => {
+  const { sec } = action;
+  if (sec) {
     return {
       ...state,
-      serverOnline: true,
-      sec, // time elapsed,
-      data: newData,
-      orderMap
+      sec
     };
   }
   return state;
+};
+
+const handleOrderSubscription = (state, action) => {
+  const { orders } = action;
+
+  if (orders) {
+    let data = [...state.data].concat(orders);
+    let orderMap = { ...state.orderMap };
+
+    // create a hash map of orderId: orderObj
+    orders.forEach(order => {
+      orderMap[order.id] = orderMap[order.id]
+        ? {
+            ...orderMap[order.id],
+            event_name: order.event_name,
+            sent_at_second: order.sent_at_second,
+            uid: order.uid
+          }
+        : order;
+    });
+
+    return {
+      ...state,
+      data,
+      orderMap
+    };
+  }
+
+  return state;
+
+  // const { order } = action;
+
+  // // if empty response just return unchanged state to prevent
+  // // rerendering caused by cloning new state
+  // if (Object.keys(order).length !== 0) {
+  //   let newData = [...state.data],
+  //     orderMap = { ...state.orderMap };
+  //   newData.unshift(order);
+  //   orderMap[order.id] = orderMap[order.id]
+  //     ? {
+  //         ...orderMap[order.id],
+  //         event_name: order.event_name,
+  //         sent_at_second: order.sent_at_second,
+  //         uid: order.uid
+  //       }
+  //     : order;
+
+  //   return {
+  //     ...state,
+  //     data: newData,
+  //     orderMap
+  //   };
+  // }
+  // return state;
 };
 
 const handleUpdateOrder = (state, action) => {
@@ -70,7 +106,9 @@ const mainReducer = (state = initialState, action) => {
     case ACTIONS.SERVER_ON:
       return { ...state, serverOnline: true };
     case ACTIONS.SUBSCRIBE_TIMER:
-      return handleSubscription(state, action);
+      return handleTimerSubscription(state, action);
+    case ACTIONS.SUBSCRIBE_ORDER:
+      return handleOrderSubscription(state, action);
     case ACTIONS.UPDATE_ORDER:
       return handleUpdateOrder(state, action);
     case ACTIONS.RESET_STORE:

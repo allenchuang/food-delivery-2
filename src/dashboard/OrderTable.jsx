@@ -160,6 +160,7 @@ const OrderTable = ({
       <Toolbar className={classes.root}>
         <div className={classes.title}>
           <Title>{title}</Title>
+          <h4>{tableData.length}</h4>
         </div>
         <Hidden mdDown>
           <div className={classes.spacer} />
