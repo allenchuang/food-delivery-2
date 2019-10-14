@@ -23,7 +23,7 @@ const socketServerURL = "http://localhost:4001"; // API proxy (http://localhost:
 let socket;
 const geoCache = {};
 
-export const connect = () => {
+const connect = () => {
   socket = io(socketServerURL);
   return new Promise(resolve => {
     socket.on("connect", () => {
@@ -59,21 +59,21 @@ const reconnect = socket => {
 };
 
 // connection monitoring sagas
-export const listenDisconnectSaga = function*(socket) {
+const listenDisconnectSaga = function*(socket) {
   while (true) {
     yield call(disconnect, socket);
     yield put({ type: ACTIONS.SERVER_OFF });
   }
 };
 
-export const listenReconnectSaga = function*(socket) {
+const listenReconnectSaga = function*(socket) {
   while (true) {
     yield call(reconnect, socket);
     yield put({ type: ACTIONS.SERVER_ON });
   }
 };
 
-export const listenWriteSaga = function*(socket) {
+const listenWriteSaga = function*(socket) {
   while (true) {
     const { order } = yield take(ACTIONS.UPDATE_ORDER);
     // yield put({ type: ACTIONS.UPDATE_ORDER, order });
@@ -92,6 +92,7 @@ export const startStopChannel = function*() {
   }
 };
 
+// helper function for fetching APIS
 async function fetchJson(url) {
   let resp;
   try {
@@ -103,14 +104,18 @@ async function fetchJson(url) {
   return resp;
 }
 
-export const fetchGeoData = function*(order) {
+const fetchGeoData = function*(order) {
   geoCache[order.id] = geoCache[order.id] ? geoCache[order.id] : {};
+
+  // only fetch unique destinations per order
+  // if not unique simply return the original order obj
   if (geoCache[order.id][order.destination]) {
     return geoCache[order.id][order.destination][order.directions]
       ? geoCache[order.id][order.destination]
       : order;
   } else {
     try {
+      // set geoCache to empty obj to make unique
       geoCache[order.id][order.destination] = {};
       yield put({ type: ACTIONS.FETCH_GEODATA_START });
       let geoCodeUrl = `${CONSTANTS.MAPBOX_GEOCODE_URL}${order.destination}.json?access_token=${CONSTANTS.MAPBOX_TOKEN}`;
@@ -138,7 +143,7 @@ export const fetchGeoData = function*(order) {
           yield put({ type: ACTIONS.FETCH_GEODATA_SUCCESS });
           const directions = directionsData.routes[0].geometry.coordinates;
 
-          // save to cache
+          // save to hash table
           geoCache[order.id][order.destination] = {
             latitude,
             longitude,
@@ -148,38 +153,43 @@ export const fetchGeoData = function*(order) {
           // Return latitude / longitude and directions obj
           return geoCache[order.id][order.destination];
         } else {
+          // Error for fetch directions API
           yield put({
             type: ACTIONS.FETCH_DIRECTIONS_FAILED,
             ...directionsData.err.message
           });
         }
       } else {
+        // Error for fetch GeoCode API
         yield put({
           type: ACTIONS.FETCH_GEOCODE_FAILED,
           ...geoCodeData.err.message
         });
       }
     } catch (e) {
+      // Error for Geo data fetch saga
       yield put({ type: ACTIONS.FETCH_GEODATA_FAILED, message: e.message });
     }
   }
 };
 
-export const listenSubscription = function*(socketChannel) {
+const listenSubscription = function*(socketChannel) {
   while (true) {
     const currentEvent = yield take(socketChannel);
 
-    // wait for all events within 1 sec interval
+    // wait for all events within throttle ms
     yield delay(CONSTANTS.THROTTLE_DELAY);
 
     // store (flush) all the events within the 1 sec interval to variable
     const bufferedEvents = yield flush(socketChannel);
     const allEvents = [currentEvent].concat(bufferedEvents);
 
+    // goes through all orders in buffer
     const eventsWithGeoData = yield all(
       allEvents.map(order => call(fetchGeoData, order))
     );
 
+    // fork a put action for all event data
     yield fork(function*(allEvents) {
       console.log("all events", allEvents);
 
@@ -202,7 +212,7 @@ const listenTimer = function*(socketChannel) {
   }
 };
 
-export const listenServerSaga = function*() {
+const listenServerSaga = function*() {
   try {
     yield put({ type: ACTIONS.CHANNEL_ON });
     const { socket, timeout } = yield race({
@@ -251,7 +261,7 @@ export const listenServerSaga = function*() {
 };
 
 // This is how channel is created
-export const createNewOrderChannel = socket =>
+const createNewOrderChannel = socket =>
   eventChannel(emit => {
     const newOrderHandler = order => emit(order);
     socket.on("newOrder", newOrderHandler);
@@ -261,7 +271,7 @@ export const createNewOrderChannel = socket =>
     };
   }, buffers.expanding(20));
 
-export const createTimerChannel = socket =>
+const createTimerChannel = socket =>
   eventChannel(emit => {
     const timerHandler = sec => emit(sec);
     socket.on("timer", timerHandler);

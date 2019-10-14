@@ -159,8 +159,9 @@ const OrderTable = ({
 
       <Toolbar className={classes.root}>
         <div className={classes.title}>
-          <Title>{title}</Title>
-          <h4>{tableData.length}</h4>
+          <Title>
+            {title} ( {tableData.length} Items )
+          </Title>
         </div>
         <Hidden mdDown>
           <div className={classes.spacer} />
