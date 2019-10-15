@@ -167,7 +167,10 @@ const OrderTable = ({
       <Toolbar className={classes.root}>
         <div className={classes.title}>
           <Title>
-            {title} ( {tableData.length} Items )
+            {title}{" "}
+            <span style={{ fontSize: "small" }}>
+              ( {tableData.length} Items )
+            </span>
           </Title>
         </div>
         <Hidden mdDown>
@@ -226,7 +229,7 @@ const OrderTable = ({
             <AutoSizer disableHeight>
               {({ width }) => (
                 <FixedSizeList
-                  height={600}
+                  height={500}
                   width={width}
                   itemSize={50}
                   itemCount={tableData.length}
