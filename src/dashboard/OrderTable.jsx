@@ -28,6 +28,9 @@ import { getOrdersWithFilters, mapOrderTypesToKey } from "../redux/selectors";
 
 import { colorEventType } from "../utils";
 
+import { FixedSizeList } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
+
 const useStyles = makeStyles(theme => ({
   root: {
     display: "flex",
@@ -50,14 +53,6 @@ const useStyles = makeStyles(theme => ({
   textField: {
     margin: theme.spacing(1)
   },
-  paper: {
-    position: "absolute",
-    width: 400,
-    backgroundColor: theme.palette.background.paper,
-    border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3)
-  },
   tableWrapper: {
     maxHeight: "80%",
     overflowY: "auto"
@@ -67,17 +62,26 @@ const useStyles = makeStyles(theme => ({
     display: "block"
   },
   orderCol: {
+    boxSizing: "content-box",
     width: "33%",
     minWidth: "200px"
   },
   eventCol: {
+    boxSizing: "content-box",
     minWidth: "120px"
+  },
+  smallCol: {
+    boxSizing: "content-box",
+    minWidth: "150px"
   },
   eventLabel: { fontWeight: "bold", padding: "4px" },
   destinationCol: {
+    boxSizing: "content-box",
     [theme.breakpoints.down("md")]: {
       whiteSpace: "nowrap"
-    }
+    },
+    width: "33%",
+    minWidth: "200px"
   },
   editBtn: {
     fontWeight: "bold",
@@ -107,39 +111,41 @@ const OrderTable = ({
   const onFilterSec = e =>
     handleFilterBySec(orderType)(parseInt(e.target.value));
 
-  const results = tableData.map(order => (
-    <TableRow hover key={order.uid}>
-      {/* <TableCell>{order.id}</TableCell> */}
-      <TableCell>
-        <small className={classes.orderId}>{order.id}</small>
-        <b>{order.name}</b>
+  const Row = ({ index, style }) => (
+    <TableRow hover key={tableData[index].uid} style={style}>
+      {/* <TableCell>{tableData[index].id}</TableCell> */}
+      <TableCell className={classes.orderCol}>
+        <small className={classes.orderId}>{tableData[index].id}</small>
+        <b>{tableData[index].name}</b>
       </TableCell>
-      <TableCell>
+      <TableCell className={classes.eventCol}>
         <small
           className={classes.eventLabel}
-          style={colorEventType(order.event_name)}
+          style={colorEventType(tableData[index].event_name)}
         >
-          {order.event_name}
+          {tableData[index].event_name}
         </small>
       </TableCell>
-      <TableCell>{order.sent_at_second}</TableCell>
+      <TableCell className={classes.smallCol}>
+        {tableData[index].sent_at_second}
+      </TableCell>
       {orderType === CONSTANTS.ALL_ORDERS && (
         <Hidden mdDown>
-          <TableCell>
-            {order.latitude}-{order.longitude}
+          <TableCell className={classes.smallCol}>
+            {tableData[index].latitude}-{tableData[index].longitude}
           </TableCell>
         </Hidden>
       )}
 
       <TableCell className={classes.destinationCol} align="right">
-        {order.destination}
+        {tableData[index].destination}
       </TableCell>
-      <TableCell align="right">
+      <TableCell align="center">
         <button
           id="edit-button"
           className={classes.editBtn}
           onClick={() => {
-            setEditOrder(order);
+            setEditOrder(tableData[index]);
             setModalState(true);
           }}
         >
@@ -147,7 +153,8 @@ const OrderTable = ({
         </button>
       </TableCell>
     </TableRow>
-  ));
+  );
+
   return (
     <React.Fragment>
       <OrderPopup
@@ -201,22 +208,34 @@ const OrderTable = ({
         <Table stickyHeader={true} size="small">
           <TableHead>
             <TableRow>
-              {/* <TableCell>ID</TableCell> */}
               <TableCell className={classes.orderCol}>Order</TableCell>
               <TableCell className={classes.eventCol}>Event</TableCell>
-              <TableCell>Secs</TableCell>
+              <TableCell className={classes.smallCol}>Secs</TableCell>
               {orderType === CONSTANTS.ALL_ORDERS && (
                 <Hidden mdDown>
-                  <TableCell>Lat-Long</TableCell>
+                  <TableCell className={classes.smallCol}>Lat-Long</TableCell>
                 </Hidden>
               )}
-              <TableCell align="right">Destination</TableCell>
-              <TableCell colSpan={1} align="center">
-                Edit
+              <TableCell className={classes.destinationCol} align="right">
+                Destination
               </TableCell>
+              <TableCell align="center">Edit</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>{results}</TableBody>
+          <TableBody>
+            <AutoSizer disableHeight>
+              {({ width }) => (
+                <FixedSizeList
+                  height={600}
+                  width={width}
+                  itemSize={50}
+                  itemCount={tableData.length}
+                >
+                  {Row}
+                </FixedSizeList>
+              )}
+            </AutoSizer>
+          </TableBody>
         </Table>
       </div>
     </React.Fragment>
