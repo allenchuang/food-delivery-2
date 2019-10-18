@@ -233,6 +233,7 @@ const OrderTable = ({
                   width={width}
                   itemSize={50}
                   itemCount={tableData.length}
+                  overscanCount={3}
                 >
                   {Row}
                 </FixedSizeList>
