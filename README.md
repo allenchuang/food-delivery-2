@@ -1,4 +1,4 @@
-# CloudKitchen Challenge Demo 2019
+# Cloudkitchen- Food Delivery Tracker 🚚
 
 This project is handmade by Allen Chuang, using Node.JS, Express, Socket.io, React, Redux, Redux-Saga, Material-UI, MapBox API, React Map GL. Using Enzyme and Jest for testing.
 
