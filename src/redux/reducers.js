@@ -48,9 +48,8 @@ const handleUpdateOrder = (state, action) => {
   // if empty response just return unchanged state to prevent
   // rerendering caused by cloning new state
   if (Object.keys(order).length !== 0) {
-    let newData = [...state.data],
+    let data = [...state.data, order],
       orderMap = { ...state.orderMap };
-    newData.unshift(order);
     orderMap[order.id] = orderMap[order.id]
       ? {
           ...orderMap[order.id],
@@ -63,7 +62,7 @@ const handleUpdateOrder = (state, action) => {
       : order;
     return {
       ...state,
-      data: newData,
+      data,
       orderMap
     };
   }

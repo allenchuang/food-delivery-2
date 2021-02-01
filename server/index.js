@@ -25,6 +25,11 @@ const io = socketIO(server, {
 // load in local data
 const data = JSON.parse(fs.readFileSync("./mock/challenge_data.json", "utf8"));
 
+let newData = data;
+for (let i = 0; i < 8; i++) {
+  newData = newData.concat(newData);
+}
+
 // server listen
 server.listen(port, () => {
   console.log(`Server Started`);
@@ -44,7 +49,7 @@ io.on("connection", socket => {
 
       // if data timestamp matches timer
       // then emit newOrder in separate channel
-      let events = data.filter(i => i.sent_at_second === sec);
+      let events = newData.filter(i => i.sent_at_second === sec);
       if (events.length > 0) {
         let event;
         for (event of events) {
